@@ -104,7 +104,7 @@ def main():
                 ),
                 torso_width,
             )
-            
+
             ups_df_mod.append(ups_mod)
             ots = None
 

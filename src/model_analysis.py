@@ -74,8 +74,7 @@ def get_poseData(model, video, time_stat):
             VIBE_data = {
                 str(k): [v[9] * 1000, v[10] * 1000, v[11] * 1000]
                 for k, v in zip(
-                    range(0, len(pkl_data[1]["joints3d"])), 
-                    pkl_data[1]["joints3d"]
+                    range(0, len(pkl_data[1]["joints3d"])), pkl_data[1]["joints3d"]
                 )
             }
 

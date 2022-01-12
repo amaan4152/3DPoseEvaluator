@@ -92,7 +92,9 @@ def align(df_model: DataFrame, df_ots: DataFrame):
         shift = np.argmax((signal.correlate(r_model_data, ots)) - ots.shape[0] - 1) * dx
         shift %= r_model_data.shape[0]
         shift = int(shift)
-        r_model_data = np.concatenate((r_model_data[shift:], r_model_data[:shift]), axis=0).flatten()
+        r_model_data = np.concatenate(
+            (r_model_data[shift:], r_model_data[:shift]), axis=0
+        ).flatten()
         new_model_data.append(r_model_data)
 
     new_model_data = np.array(new_model_data)

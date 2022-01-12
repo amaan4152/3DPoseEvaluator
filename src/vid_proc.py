@@ -9,15 +9,15 @@ class VidProc:
     AMAAN RAHMAN
 
     This script generates output video files within any range of frames
-    for multiple viewports or input video file. 
+    for multiple viewports or input video file.
 
     Press ENTER/SPACEBAR when done selecting your ROI. After selecting multiple
-    ROIs, press ESC to proceed with processing output video files within each ROI viewport. 
+    ROIs, press ESC to proceed with processing output video files within each ROI viewport.
 
-    REMARKS: Bugs with QObject threading or other inconsistent bugs could be possible depending on 
-    your opencv-python pip version, check the requirements file regarding this remark. 
+    REMARKS: Bugs with QObject threading or other inconsistent bugs could be possible depending on
+    your opencv-python pip version, check the requirements file regarding this remark.
     """
-    
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     bLCornerText = (10, 500)
     fScale = 1
@@ -99,9 +99,7 @@ class VidProc:
                 for f in self.mod_frames:
                     f_h, f_w, _ = f.shape
                     out_name = f""
-                    (
-                        self.out_fname + "_VIEWPORT_" + str(viewport_num) + ".mp4"
-                    )
+                    (self.out_fname + "_VIEWPORT_" + str(viewport_num) + ".mp4")
                     self.out_caps.append(
                         cv2.VideoWriter(
                             out_name,

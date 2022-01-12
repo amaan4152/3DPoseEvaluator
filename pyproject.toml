@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "nist-3dpose_evaluator"
+version = "0.1.0"
+description = "Program to evaluate NIST-provided human locomotion video sequences with 3D pose estimation algorithms: GAST-NET, VIBE, and Blazepose"
+authors = ["Amaan Rahman <amaan.rahman.usa@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
