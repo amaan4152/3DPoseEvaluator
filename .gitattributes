@@ -1,0 +1,5 @@
+videos/GAIT_00.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/noexo_res_trim_00.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/parallel_rail_hurdle_Without[[:space:]]EXO.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/Trial1cameraA_20190624.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/4_RES.mp4 filter=lfs diff=lfs merge=lfs -text
