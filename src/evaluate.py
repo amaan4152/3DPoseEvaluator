@@ -31,8 +31,9 @@ def main():
         print("========== VIDEO PROCESSING UNIT (END) ==========\n")
 
     # get video files
+    vid_dir = "videos/"
     wdir_list = os.listdir(
-        "."
+        vid_dir
     )  # possible search a reserved dir (created by vid_proc.py) of output video files?
     wdir_list = [file for file in wdir_list if "VIEWPORT" in file]
     wdir_list.sort(
@@ -55,7 +56,7 @@ def main():
 
         vid_selec = [list(filter(lambda s: i in s, wdir_list)) for i in vid_selec_l]
         print(vid_selec[0])
-        vid = mp.VideoFileClip(vid_selec[0][0])
+        vid = mp.VideoFileClip(f"{vid_dir}{vid_selec[0][0]}")
         DURATION = int(vid.duration)
         if [] not in vid_selec:
             break
@@ -68,7 +69,7 @@ def main():
         model = [args.model]
 
     OTS_pos, OTS_quat, OTS_theta, skpd_frames, torso_width, frame_stat = get_OTSData(
-        args.data, args.test, args.start, args.end, DURATION
+        args.data, args.test, args.start, DURATION
     )
     ots = (OTS_theta, OTS_pos, OTS_quat)
     print("[CHECKPOINT-ID:01] -> OTS data extracted appropriately\n")
@@ -78,7 +79,7 @@ def main():
     # extract the data
     mpjpe = {}
     pjd = {}
-    df, df_theta, ups_df_mod = None, pd.DataFrame(), []
+    df, ups_df_mod = None, []
     for vid in vid_selec:
         vid = vid[0]
         for m in model:
@@ -171,7 +172,8 @@ def main():
 
     set_style("darkgrid")
     set(font_scale=1.5)
-    fig, (ax_data, ax_error) = plt.subplots(nrows=2, ncols=1)
+
+    fig, (ax_data, ax_error) = plt.subplots(nrows=2, ncols=1, figsize=(23, 16))
     plt.setp((ax_data, ax_error), xticks=np.arange(0, df.shape[0], 500))
 
     ax_dat = lineplot(
@@ -237,9 +239,8 @@ def main():
     fig.legend(handles=legend_elements, bbox_to_anchor=(0.99, 0.6), prop={"size": 18})
     plt.subplots_adjust(top=0.92, right=0.8, hspace=0.5, bottom=0.08)
 
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
-    plt.show()
+    plt.tight_layout()
+    plt.savefig("graph.png")
 
     return 1
 

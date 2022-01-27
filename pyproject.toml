@@ -22,6 +22,7 @@ argparse = "^1.4.0"
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
 flake8 = "^4.0.1"
+pylint = "^2.12.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -9,7 +9,7 @@ def str_has(string, *args):
     return any([marker_label in string for marker_label in set(args)])
 
 
-def get_OTSData(file, test_type, sframe, fframe, vid_duration):
+def get_OTSData(file, test_type, sframe, vid_duration):
     print("===== OTS DATA EXTRACTION =====")
     FEM_quat = {}
     TIB_quat = {}
@@ -26,6 +26,7 @@ def get_OTSData(file, test_type, sframe, fframe, vid_duration):
         if col_dat.values[0] == "Rotation":
             if test_type is None or str_has(col_dat.name, "RThigh", "RShin"):
                 QUAT_data.append(col_dat)
+
         elif str_has(col_dat.name, "WaistLFront", "WaistRFront", "RKnee", "RAnkle"):
             POS_data.append(col_dat)
 

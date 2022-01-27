@@ -98,7 +98,7 @@ class VidProc:
                 # given quad input video, generate output video files per selected ROI by the user
                 for f in self.mod_frames:
                     f_h, f_w, _ = f.shape
-                    out_name = f""
+                    out_name = ""
                     (self.out_fname + "_VIEWPORT_" + str(viewport_num) + ".mp4")
                     self.out_caps.append(
                         cv2.VideoWriter(

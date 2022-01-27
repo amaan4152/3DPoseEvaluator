@@ -11,7 +11,7 @@ import subprocess as sp
 from tqdm import tqdm
 
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
-
+src_dir = "./src"
 
 def get_vec(p1, p2):
     p1 = np.array(p1)
@@ -38,7 +38,7 @@ def get_dataFile(proc, type):
             if type in out:
                 dataFile = out.strip()
             print(out.strip())
-    rc = proc.poll()  # capture exit code of child process
+
     return dataFile
 
 
@@ -47,7 +47,7 @@ def get_poseData(model, video, time_stat):
         if model == "VIBE":
 
             dir_name = video.split(".")[0]
-            print("./VIBE/output/" + dir_name + "/")
+            print(f"{src_dir}/VIBE/output/{dir_name}/")
             try:
                 wdir_list = os.listdir("./VIBE/output/" + dir_name + "/")
                 wdir_list = [file for file in wdir_list if ".pkl" in file]
@@ -65,7 +65,7 @@ def get_poseData(model, video, time_stat):
 
             else:
                 pkl_file = os.path.abspath(
-                    "./VIBE/output/" + dir_name + "/" + b_vibe_gen
+                    f"{src_dir}/VIBE/output/{dir_name}/{b_vibe_gen}"
                 )
 
             # joints 12, 13, 14 are the left hip, left knee, and left ankle respectively
@@ -110,19 +110,19 @@ def get_poseData(model, video, time_stat):
 
         elif model == "GAST":
             # fix GAST dir path resolution!
-            wdir_list = os.listdir("./GAST-Net-3DPoseEstimation/output/")
+            wdir_list = os.listdir(f"{src_dir}/GAST-Net-3DPoseEstimation/output/")
             wdir_list = [file for file in wdir_list if ".npz" in file]
             print(*wdir_list, sep="\n")
             b_gast_gen = input(
                 "Execute GAST-NET model? [y/...] If not, then choose which GAST joint data file to use: "
             )
             if b_gast_gen in ("Y", "y"):
-                copy(video, "./GAST-Net-3DPoseEstimation/data/video/")
-                gproc = sp.Popen(["./exec_models.sh", "GAST", video], stdout=sp.PIPE)
+                copy(video, f"{src_dir}/GAST-Net-3DPoseEstimation/data/video/")
+                gproc = sp.Popen([f"{src_dir}/exec_models.sh", "GAST", video], stdout=sp.PIPE)
                 npz_file = get_dataFile(gproc, ".npz")
             else:
                 npz_file = os.path.abspath(
-                    "./GAST-Net-3DPoseEstimation/output/" + b_gast_gen
+                    f"{src_dir}/GAST-Net-3DPoseEstimation/output/{b_gast_gen}"
                 )
 
             # WARNING: 3D coordinate system for GAST revolves around pelvis (keypoint #0) as origin
@@ -169,7 +169,7 @@ def get_poseData(model, video, time_stat):
             pbar.set_description("Frame # Progress: ")
             with mp_pose.Pose(
                 min_detection_confidence=0.5, min_tracking_confidence=0.5
-            ) as pose:
+            ) as _:
                 while cap.isOpened():
                     s, img = cap.read()
                     if not s:
@@ -179,8 +179,8 @@ def get_poseData(model, video, time_stat):
 
                     img.flags.writeable = False
                     img = cvtColor(img, COLOR_BGR2RGB)
-                    output = pose.process(img)
                     pbar.update(1)
+
             pbar.close()
             exit(1)
 
