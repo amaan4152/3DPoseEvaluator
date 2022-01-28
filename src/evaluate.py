@@ -115,7 +115,7 @@ def main():
     mpjpe = pd.DataFrame.from_dict(mpjpe)
     pjd = pd.DataFrame.from_dict(pjd)
     metrics = pd.concat([mpjpe, pjd], axis=1)
-    df.to_csv("results.csv", index=False)
+    df.to_csv("output/results.csv", index=False)
 
     print(df.describe().T)
     print(metrics.describe().T)
@@ -240,7 +240,7 @@ def main():
     plt.subplots_adjust(top=0.92, right=0.8, hspace=0.5, bottom=0.08)
 
     plt.tight_layout()
-    plt.savefig("graph.png")
+    plt.savefig("output/graph.png")
 
     return 1
 
