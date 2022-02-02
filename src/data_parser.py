@@ -72,7 +72,6 @@ def calibrate(MODEL, OTS):
 
     return MODEL_t
 
-
 def align(df_model: DataFrame, df_ots: DataFrame):
     ots_len = df_ots.shape[0]
     mod_len = df_model.shape[0]
