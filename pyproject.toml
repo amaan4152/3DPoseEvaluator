@@ -20,6 +20,7 @@ mediapipe = "^0.8.9"
 argparse = "^1.4.0"
 Cython = "^0.29.26"
 setuptools = "^60.5.0"
+ffmpeg = "^1.4"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
