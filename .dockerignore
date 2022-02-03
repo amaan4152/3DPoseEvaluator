@@ -1,4 +1,11 @@
+.git
 src/GAST-Net-3DPoseEstimation
 src/VIBE
 src/traj-dist
+src/__pycache__
+video-lib
+.venv
+output/*
 README.md
+.gitignore
+.python-version

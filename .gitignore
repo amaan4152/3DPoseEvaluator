@@ -1,5 +1,6 @@
 .python-version
 videos/
+video-lib/
 src/__pycache__/
 src/GAST-Net-3DPoseEstimation/
 src/VIBE/
