@@ -12,7 +12,6 @@ import os
 
 DURATION = 0
 
-
 def main():
     pcli, args = cli_parse()
     if None in (args.model, args.video, args.data):

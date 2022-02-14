@@ -49,7 +49,7 @@ def get_poseData(model, video, time_stat):
             dir_name = video.split(".")[0]
             print(f"{src_dir}/VIBE/output/{dir_name}/")
             try:
-                wdir_list = os.listdir("./VIBE/output/" + dir_name + "/")
+                wdir_list = os.listdir(f"{src_dir}/VIBE/output/" + dir_name + "/")
                 wdir_list = [file for file in wdir_list if ".pkl" in file]
                 print(*wdir_list, sep="\n")
 
@@ -60,7 +60,7 @@ def get_poseData(model, video, time_stat):
                 "Execute VIBE model? [y/...] If not, then choose which VIBE data file to use: "
             )
             if b_vibe_gen in ("Y", "y"):
-                vproc = sp.Popen(["./exec_models.sh", "VIBE", video], stdout=sp.PIPE)
+                vproc = sp.Popen([f"{src_dir}/exec_models.sh", "VIBE", video], stdout=sp.PIPE)
                 pkl_file = get_dataFile(vproc, ".pkl")
 
             else:

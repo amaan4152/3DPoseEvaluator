@@ -16,17 +16,16 @@ do
         VIBE)
             printf "\n ----- \e[3mInitiating\e[0;1;96m VIBE \e[0m----- \n\n"
 
-            cd "./VIBE/" || exit 1
-            source "$(pwd)/vibe-env/bin/activate"  # enter python virtual environment for VIBE
-            python3 demo.py --vid_file "../${VNAME}" --output_folder "output/"            
+            cd "./src/VIBE/" || exit 1
+            source "$(pwd)/vibe-env/bin/activate"
+            python3 demo.py --vid_file "../${VNAME}" --output_folder "output/" --no_render   
             PKL_PATH=$(realpath "./output/${VNAME//".mp4"}/vibe_output.pkl")
             echo "$PKL_PATH"
-            deactivate
             ;;
 
         GAST)
             printf "\n ----- \e[3mInitiating\e[0;1;35m GAST \e[0m----- \n\n"
-            cd "./GAST-Net-3DPoseEstimation/" || exit 1
+            cd "./src/GAST-Net-3DPoseEstimation/" || exit 1
             pyenv activate gast_env
             python3 gen_skes.py -v "$VNAME" -np "$POSE_NUM"
             NPZ_PATH=$(find "./output/" -name "${VNAME//".mp4"/}.npz")
