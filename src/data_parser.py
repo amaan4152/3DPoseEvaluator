@@ -72,6 +72,7 @@ def calibrate(MODEL, OTS):
 
     return MODEL_t
 
+
 def align(df_model: DataFrame, df_ots: DataFrame):
     ots_len = df_ots.shape[0]
     mod_len = df_model.shape[0]
@@ -100,8 +101,64 @@ def align(df_model: DataFrame, df_ots: DataFrame):
     return df_new_model
 
 
+def data_parse2(model_name: str, model_data: dict, joints: dict) -> pd.DataFrame:
+    """
+    Parse pose estimation data into DataFrames with the following order:
+        [POSITION (XYZ), THETA (joint angle), QUATERNION (orientation), ... ]
+
+    Parameters
+    ----------
+    model_name: name of pose estimation algo
+    model_data: dictionary of estimated joint positions, joint angles, and orientations
+    joints: dictionary of graphical relation of joints
+            {'vertex' : [joint_a, vertex, joint_b] (any order)}
+
+    Return
+    ------
+    DataFrame object of estimated data
+    """
+    df = None
+    for v, joint_list in joints.items():
+        # column names
+        theta_column = [f"{model_name}:{v}:theta"]
+        pos_columns = [
+            f"{model_name}:{j}:pos-{axis}"
+            for j in joint_list
+            for axis in ["X", "Y", "Z"]
+        ]
+        quat_columns = [
+            f"{model_name}:{j}:quat-{axis}"
+            for j in joint_list
+            for axis in ["W", "X", "Y", "Z"]
+        ]
+
+        # make dataframes
+        df_theta = pd.DataFrame.from_dict(
+            model_data["theta"], orient="index", columns=theta_column
+        )
+
+        # Note: need to make sure that the order of model_data matches column labels!
+        df_joints = None
+        for i in range(len(joint_list)):
+            df_pos = pd.DataFrame.from_dict(
+                model_data["pos"][i],
+                orient="index",
+                columns=pos_columns[(3 * i) : (3 * (i + 1))],
+            )
+            """
+            df_quat = pd.DataFrame.from_dict(
+                model_data["quat"], orient="index", columns=quat_columns[(4*i):(4*(i + 1))]
+            )
+            """
+            df_joints = pd.concat([df_joints, df_pos], axis=1)
+
+        df = pd.concat([df, df_theta, df_joints], axis=1)
+
+    return df
+
+
 # fix for multiple models running at once
-def data_parse(df, ots, model, model_name, torso_diam):
+def data_parse(df, ots, model, model_name, torso_diam, no_eval=False):
     if ots != None:
         df_first = pd.DataFrame.from_dict(
             ots[0], orient="index", columns=["OTS:KNEE_JOINT:ANGLE"]
@@ -159,6 +216,14 @@ def data_parse(df, ots, model, model_name, torso_diam):
             model_name + ":ANKLE:Z",
         ],
     )
+
+    if not no_eval:
+        df_mod = pd.concat([df_mod_theta, df_mod_p_h, df_mod_p_k, df_mod_p_a], axis=1)
+        df_cat = pd.concat(
+            [df_first.reset_index(drop=True), df_mod.reset_index(drop=True)], axis=1
+        )
+        df_cat.to_csv("raw_pose_data.csv")
+        return None
 
     # calibrate model data with OTS data
     df_mod_p_h.iloc[:] = calibrate(df_mod_p_h, df_ots_p_h)
@@ -267,6 +332,11 @@ def cli_parse():
     )
     pcli.add_argument(
         "-d", "--data", action="store", type=str, help="ground truth data"
+    )
+    pcli.add_argument(
+        "--no_eval",
+        action="store_true",
+        help="Enable to generate raw pose data",
     )
     pcli.add_argument(
         "--start",

@@ -1,6 +1,14 @@
 import joblib as jb
 
-from cv2 import VideoCapture, cvtColor, COLOR_BGR2RGB
+import cv2
+from cv2 import (
+    VideoCapture,
+    cvtColor,
+    COLOR_BGR2RGB,
+    imshow,
+    VideoWriter,
+    VideoWriter_fourcc,
+)
 import numpy as np
 import math
 import mediapipe as mp
@@ -10,8 +18,45 @@ from shutil import copy
 import subprocess as sp
 from tqdm import tqdm
 
+GAST_JOINTS = {
+    "PELVIS": 0,
+    "RIGHT_HIP": 1,
+    "RIGHT_KNEE": 2,
+    "RIGHT_ANKLE": 3,
+    "LEFT_HIP": 4,
+    "LEFT_KNEE": 5,
+    "LEFT_ANKLE": 6,
+    "SPINE": 7,
+    "THORAX": 8,
+    "NECK": 9,
+    "HEAD": 10,
+    "LEFT_SHOULER": 11,
+    "LEFT_ELBOW": 12,
+    "LEFT_WRIST": 13,
+    "RIGHT_SHOULDER": 14,
+    "RIGHT_ELBOW": 15,
+    "RIGHT_WRIST": 16,
+}
+
+BLAZEPOSE_JOINTS = {
+    "RIGHT_HIP": 24,
+    "RIGHT_KNEE": 26,
+    "RIGHT_ANKLE": 28,
+    "LEFT_HIP": 23,
+    "LEFT_KNEE": 25,
+    "LEFT_ANKLE": 27,
+    "HEAD": 0,  # nose
+    "LEFT_SHOULER": 11,
+    "LEFT_ELBOW": 13,
+    "LEFT_WRIST": 15,
+    "RIGHT_SHOULDER": 12,
+    "RIGHT_ELBOW": 14,
+    "RIGHT_WRIST": 16,
+}
+
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
 src_dir = "./src"
+
 
 def get_vec(p1, p2):
     p1 = np.array(p1)
@@ -42,11 +87,21 @@ def get_dataFile(proc, type):
     return dataFile
 
 
-def get_poseData(model, video, time_stat):
+"""
+FEATURES TO ADD:
+----------------
+- choose what joints to extract raw pose data from
+    - must have same format and share same joints
+"""
+
+
+def get_poseData(video, model, sframe, fframe):
+    time_stat = (sframe, fframe)
     if model in poseModels:
         if model == "VIBE":
 
-            dir_name = video.split(".")[0]
+            dir_name = video.split("/")[-1].split(".")[0]
+
             print(f"{src_dir}/VIBE/output/{dir_name}/")
             try:
                 wdir_list = os.listdir(f"{src_dir}/VIBE/output/" + dir_name + "/")
@@ -60,7 +115,9 @@ def get_poseData(model, video, time_stat):
                 "Execute VIBE model? [y/...] If not, then choose which VIBE data file to use: "
             )
             if b_vibe_gen in ("Y", "y"):
-                vproc = sp.Popen([f"{src_dir}/exec_models.sh", "VIBE", video], stdout=sp.PIPE)
+                vproc = sp.Popen(
+                    [f"{src_dir}/exec_models.sh", "VIBE", video], stdout=sp.PIPE
+                )
                 pkl_file = get_dataFile(vproc, ".pkl")
 
             else:
@@ -117,8 +174,14 @@ def get_poseData(model, video, time_stat):
                 "Execute GAST-NET model? [y/...] If not, then choose which GAST joint data file to use: "
             )
             if b_gast_gen in ("Y", "y"):
-                copy(video, f"{src_dir}/GAST-Net-3DPoseEstimation/data/video/")
-                gproc = sp.Popen([f"{src_dir}/exec_models.sh", "GAST", video], stdout=sp.PIPE)
+                copy(
+                    video,
+                    f"{src_dir}/GAST-Net-3DPoseEstimation/data/video/",
+                )
+                gproc = sp.Popen(
+                    [f"{src_dir}/exec_models.sh", "GAST", video.split("/")[-1]],
+                    stdout=sp.PIPE,
+                )
                 npz_file = get_dataFile(gproc, ".npz")
             else:
                 npz_file = os.path.abspath(
@@ -162,27 +225,118 @@ def get_poseData(model, video, time_stat):
 
         elif model == "BLAZEPOSE":
             mp_pose = mp.solutions.pose
-            cap = VideoCapture(video)
+            mp_drawing = mp.solutions.drawing_utils
+            mp_drawing_styles = mp.solutions.drawing_styles
+
+            fname = f"videos/Trial1cameraA_20190624.mp4"
+            print(fname)
+            cap = VideoCapture(fname)
+            h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            o_cap = VideoWriter(
+                "TrialCamA_out.mp4", VideoWriter_fourcc(*"mp4v"), 15, (h, w)
+            )
 
             total_frames = int(time_stat[1] * 25)
             pbar = tqdm(total=total_frames, ncols=100)
             pbar.set_description("Frame # Progress: ")
+            frame_num = 1
+
+            BP_joint_angle = {}
+            BP_quat = {}
+            HIP_pos = {}
+            KNEE_pos = {}
+            ANKL_pos = {}
             with mp_pose.Pose(
                 min_detection_confidence=0.5, min_tracking_confidence=0.5
-            ) as _:
+            ) as pose:
                 while cap.isOpened():
                     s, img = cap.read()
                     if not s:
-                        print("[MEDIAPIPE]: Empty frame detected...")
+                        print("=== BROKEN FRAME ===")
+                        break
+
+                    if frame_num < 1000:
+                        frame_num += 1
                         pbar.update(1)
                         continue
+                    elif frame_num > 1300:
+                        break
 
                     img.flags.writeable = False
                     img = cvtColor(img, COLOR_BGR2RGB)
+                    results = pose.process(img)
+                    rhip_x = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_HIP
+                    ].x
+                    rhip_y = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_HIP
+                    ].y
+                    rhip_z = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_HIP
+                    ].z
+                    rknee_x = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_KNEE
+                    ].x
+                    rknee_y = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_KNEE
+                    ].y
+                    rknee_z = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_KNEE
+                    ].z
+                    rankle_x = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_ANKLE
+                    ].x
+                    rankle_y = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_ANKLE
+                    ].y
+                    rankle_z = results.pose_landmarks.landmark[
+                        mp_pose.PoseLandmark.RIGHT_ANKLE
+                    ].z
+                    rhip = np.array([rhip_x, rhip_y, rhip_z])
+                    rknee = np.array([rknee_x, rknee_y, rknee_z])
+                    rankle = np.array([rankle_x, rankle_y, rankle_z])
+                    rfemur = rknee - rhip
+                    rtibia = rankle - rknee
+                    estim_theta = 180 - joint_angle(rfemur, rtibia)
+                    estim_axis = np.cross(rfemur, rtibia)
+                    estim_quat = pq.Quaternion(axis=estim_axis, angle=estim_theta)
+                    BP_joint_angle[str(frame_num)] = estim_theta
+                    BP_quat[str(frame_num)] = (
+                        estim_quat.elements[0],
+                        estim_quat.elements[1],
+                        estim_quat.elements[2],
+                        estim_quat.elements[3],
+                    )
+                    HIP_pos[str(frame_num)] = rhip
+                    KNEE_pos[str(frame_num)] = rknee
+                    ANKL_pos[str(frame_num)] = rankle
+
+                    # Draw the pose annotation on the image.
+                    img.flags.writeable = True
+                    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    mp_drawing.draw_landmarks(
+                        img,
+                        results.pose_landmarks,
+                        mp_pose.POSE_CONNECTIONS,
+                        landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style(),
+                    )
+                    # Flip the image horizontally for a selfie-view display.
+                    img = cv2.flip(img, 1)
+                    cv2.imshow("MediaPipe Pose", img)
+                    o_cap.write(img)
+                    if cv2.waitKey(1) & 0xFF == 27:
+                        break
+
                     pbar.update(1)
+                    frame_num += 1
 
             pbar.close()
-            exit(1)
+            cap.release()
+            o_cap.release()
+            cv2.destroyAllWindows()
+            BP_pos = [HIP_pos, KNEE_pos, ANKL_pos]
+            return BP_pos, BP_joint_angle, BP_quat
 
     else:
         print("<ERROR>: 3D Pose Estimation model not supported..")

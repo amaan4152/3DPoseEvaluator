@@ -4,44 +4,33 @@ RUN apt-get update && \
     apt-get --no-install-recommends --no-install-suggests -yq install make python3-opencv git
 RUN apt-get install --no-install-recommends --no-install-suggests -yq build-essential gcc libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
-    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev openssl
+    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev openssl ffmpeg
 RUN curl https://pyenv.run | bash
 RUN pip3 install poetry
-RUN poetry config virtualenvs.in-project false
 
-FROM base as poetry-build
-WORKDIR /root/build
-COPY poetry.lock pyproject.toml ./
-RUN poetry install --no-dev
 
 FROM base as pyenv-config
 ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
 COPY --from=base /root/.pyenv/ /root/.pyenv/
-COPY --from=poetry-build /root/build/ /root/build/
 COPY scripts/ /root/build/scripts/
 WORKDIR /root/build/scripts
 SHELL ["/bin/bash", "-c"]
 RUN bash -x init_pyenv.sh
 
-FROM poetry-build as proj-config
+
+# Ref: https://medium.com/@acpanjan/download-google-drive-files-using-wget-3c2c025a8b99
+FROM pyenv-config as add-gast
 COPY --from=pyenv-config /root/build/ /root/build/
 COPY --from=pyenv-config /root/.bashrc /root/.bashrc
-WORKDIR /root/build
-COPY Makefile ./
-COPY src src/
-COPY videos videos/
-COPY data data/
-RUN mkdir output
-
-FROM pyenv-config as add-gast
-COPY --from=pyenv-config /root/ /root/
+COPY --from=pyenv-config /root/.pyenv /root/
 SHELL ["/bin/bash", "-c"]
-RUN git clone https://github.com/fabro66/GAST-Net-3DPoseEstimation.git /root/build/src/GAST-Net-3DPoseEstimation
-WORKDIR /root/build/src/GAST-Net-3DPoseEstimation
+RUN git clone https://github.com/fabro66/GAST-Net-3DPoseEstimation.git /root/GAST-Net-3DPoseEstimation
+WORKDIR /root/GAST-Net-3DPoseEstimation
+COPY videos data/video/
 RUN source ~/.bashrc pyenv && \
     pyenv local gast-env && \
     python3 -m pip install -U pip && \
-    pip install -r ../gast-net/requirements.txt
+    pip install -r ../gast-requirements.txt
 RUN mkdir checkpoint && cd checkpoint && \
     mkdir yolov3 hrnet gastnet
 RUN cd checkpoint/yolov3 && wget https://pjreddie.com/media/files/yolov3.weights
@@ -52,13 +41,12 @@ RUN mkdir checkpoint/hrnet/pose_coco && \
     -O pose_hrnet_w48_384x288.pth && rm -rf /tmp/cookies.txt
 RUN cd checkpoint/gastnet && \
     wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1vh29QoxIfNT4Roqw1SuHDxxKex53xlOB' -O 27_frame_model.bin
-RUN apt-get install -y ffmpeg   
 
-FROM proj-config as add-vibe
-ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
-COPY --from=base /root/.pyenv/ /root/.pyenv/
-COPY --from=poetry-build /root/build/ /root/build/
-COPY scripts/ /root/build/scripts/
+
+FROM pyenv-config as add-vibe
+COPY --from=add-gast /root/build/ /root/build/
+COPY --from=add-gast /root/.bashrc /root/.bashrc
+COPY --from=add-gast /root/.pyenv /root/
 SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/mkocabas/VIBE.git /root/build/src/VIBE
 WORKDIR /root/build/src/VIBE
@@ -71,3 +59,16 @@ RUN source ~/.bashrc && \
     pip install gdown
 RUN apt-get install unzip
 RUN source scripts/prepare_data.sh
+
+
+FROM add-gast as build
+COPY --from=add-gast /root/ /root
+WORKDIR /root/build
+COPY Makefile ./
+COPY src src/
+COPY videos videos/
+COPY data data/
+RUN mkdir output
+COPY poetry.lock pyproject.toml ./
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev

@@ -12,16 +12,10 @@ import os
 
 DURATION = 0
 
-def main():
-    pcli, args = cli_parse()
-    if None in (args.model, args.video, args.data):
-        print("ERROR: must provide arguments for '-m' and '-v'\n")
-        pcli.print_help()
-        exit(1)
 
-    # quad video processing
+def getVideos(vid, start_frame, end_frame):
     cont = input("Skip video processing?[Y/n] ")
-    vp = VidProc(args.video, args.start, args.end)
+    vp = VidProc(vid, start_frame, end_frame)
     if cont in ("N", "n"):
         print("\n========== VIDEO PROCESSING UNIT (START) ==========")
         vp.gen_OutVideo(True)
@@ -56,24 +50,34 @@ def main():
         vid_selec = [list(filter(lambda s: i in s, wdir_list)) for i in vid_selec_l]
         print(vid_selec[0])
         vid = mp.VideoFileClip(f"{vid_dir}{vid_selec[0][0]}")
-        DURATION = int(vid.duration)
+        duration = int(vid.duration)
         if [] not in vid_selec:
             break
 
         print("ERROR: Incorrect video selection...")
 
+    return duration, vid_selec
+
+
+def main():
+    pcli, args = cli_parse()
+    if None in (args.model, args.video, args.data):
+        print("ERROR: must provide arguments for '-m' and '-v'\n")
+        pcli.print_help()
+        exit(1)
+
+    DURATION, vid_selec = getVideos(args.video, args.start, args.end)
+    print("[CHECKPOINT-ID:01] -> Video file(s) acquired\n")
+
     if args.model in ("all", "ALL", "aLL", "All"):
         model = ["GAST", "VIBE"]
     else:
         model = [args.model]
-
     OTS_pos, OTS_quat, OTS_theta, skpd_frames, torso_width, frame_stat = get_OTSData(
         args.data, args.test, args.start, DURATION
     )
     ots = (OTS_theta, OTS_pos, OTS_quat)
-    print("[CHECKPOINT-ID:01] -> OTS data extracted appropriately\n")
-
-    print("[CHECKPOINT-ID:02] -> Video file(s) acquired\n")
+    print("[CHECKPOINT-ID:02] -> OTS data extracted appropriately\n")
 
     # extract the data
     mpjpe = {}
@@ -93,7 +97,7 @@ def main():
                     if val in MODEL_theta.keys()
                 ]
 
-            df, ups_mod, mpjpe[m], pjd[m] = data_parse(
+            eval_data = data_parse(
                 df,
                 ots,
                 (MODEL_theta, MODEL_pos, MODEL_quat),
@@ -103,9 +107,13 @@ def main():
                     + vid[(vid.rindex("VIEWPORT_") + len("VIEWPORT_")) : vid.index(".")]
                 ),
                 torso_width,
+                True,
             )
 
-            ups_df_mod.append(ups_mod)
+            if eval_data is not None:
+                df, ups_mod, mpjpe[m], pjd[m] = eval_data
+                ups_df_mod.append(ups_mod)
+
             ots = None
 
     print(ups_df_mod)

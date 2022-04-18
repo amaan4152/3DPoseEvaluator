@@ -17,8 +17,10 @@ do
             printf "\n ----- \e[3mInitiating\e[0;1;96m VIBE \e[0m----- \n\n"
 
             cd "./src/VIBE/" || exit 1
-            source "$(pwd)/vibe-env/bin/activate"
-            python3 demo.py --vid_file "../${VNAME}" --output_folder "output/" --no_render   
+            source vibe-env/bin/activate
+            # for docker:
+            # pyenv activate vibe-env
+            python3 demo.py --vid_file "../../${VNAME}" --output_folder "output/" --no_render   
             PKL_PATH=$(realpath "./output/${VNAME//".mp4"}/vibe_output.pkl")
             echo "$PKL_PATH"
             ;;
@@ -27,6 +29,8 @@ do
             printf "\n ----- \e[3mInitiating\e[0;1;35m GAST \e[0m----- \n\n"
             cd "./src/GAST-Net-3DPoseEstimation/" || exit 1
             pyenv activate gast_env
+            # for docker:
+            # pyenv activate gast-env
             python3 gen_skes.py -v "$VNAME" -np "$POSE_NUM"
             NPZ_PATH=$(find "./output/" -name "${VNAME//".mp4"/}.npz")
             NPZ_PATH=$(realpath "$NPZ_PATH")

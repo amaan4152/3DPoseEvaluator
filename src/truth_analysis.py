@@ -31,7 +31,8 @@ def get_OTSData(file, test_type, sframe, vid_duration):
             POS_data.append(col_dat)
 
     # get the index of the rows that contains the start frame # data and the end frame # data
-    frame_stats = ((sframe * 2 - 1), (sframe * 2 - 1) + vid_duration * OTS_FPS)
+    frame_stats = (int(sframe * 2 - 1), int((sframe * 2 - 1) + vid_duration * OTS_FPS))
+    print(f"Frame stats: {frame_stats}")
     ind = OTS_data.index[
         (OTS_data.iloc[:, 0] == str(frame_stats[0]))
         | (OTS_data.iloc[:, 0] == str(frame_stats[1]))

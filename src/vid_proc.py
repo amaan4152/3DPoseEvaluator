@@ -57,11 +57,7 @@ class VidProc:
 
     def close(self):
         self.cap.release()
-        if self.out_caps:  # release all output video capture objects
-            for o_cap in self.out_caps:
-                o_cap.release()
-        else:
-            self.out_cap.release()
+        self.out_caps.release()
         cv2.destroyAllWindows()
 
     # generate list of cropped frames given a list of rectangular ROIs
@@ -98,29 +94,29 @@ class VidProc:
                 # given quad input video, generate output video files per selected ROI by the user
                 for f in self.mod_frames:
                     f_h, f_w, _ = f.shape
-                    out_name = ""
-                    (self.out_fname + "_VIEWPORT_" + str(viewport_num) + ".mp4")
-                    self.out_caps.append(
-                        cv2.VideoWriter(
-                            out_name,
-                            cv2.VideoWriter_fourcc(*"MP4V"),
-                            self.cap.get(cv2.CAP_PROP_FPS),
-                            (f_w, f_h),
-                        )
+                    self.out_fname = (
+                        f"videos/{self.out_fname}_VIEWPORT_{viewport_num}.avi"
                     )
-                    self.output_videos.append(out_name)
+                    self.out_caps = cv2.VideoWriter(
+                        self.out_fname,
+                        cv2.VideoWriter_fourcc(*"mjpg"),
+                        30,
+                        (f_w, f_h),
+                    )
+                    self.output_videos.append(self.out_fname)
                     viewport_num += 1
 
             else:  # when input video is not a quad
                 frame_height, frame_width, _ = frame.shape
                 self.out_cap = cv2.VideoWriter(
                     self.out_fname,
-                    cv2.VideoWriter_fourcc(*"MP4V"),
+                    cv2.VideoWriter_fourcc(*"mjpg"),
                     self.cap.get(cv2.CAP_PROP_FPS),
                     (frame_width, frame_height),
                 )
 
-            self.cap.open(
+            self.cap.release()
+            self.cap = cv2.VideoCapture(
                 self.video_path
             )  # reinitialize video capture object for reset
             cv2.destroyAllWindows()
@@ -132,9 +128,7 @@ class VidProc:
         )
 
         total_frames = (
-            (self.START + self.TOTAL - 1)
-            if self.final_frame == -1
-            else self.final_frame
+            (self.START + self.TOTAL) if self.final_frame == -1 else self.final_frame
         )
         print(total_frames)
         pbar = tqdm(total=total_frames, ncols=100)
@@ -147,16 +141,16 @@ class VidProc:
                 print("ERROR: Empty frame detected")
                 break
 
-            frame = np.copy(frame)
+            frame = frame.copy()
 
             # if a start frame number specified, block all processing till start frame number is reached
-            if frame_num < self.start_frame:
+            if frame_num < self.start_frame + 1:
                 pbar.update(1)
                 frame_num += 1
                 continue
 
             # if a final frame number specified, exit processing
-            if frame_num == self.final_frame:
+            if frame_num == self.final_frame + 1:
                 break
 
             if isQuad:
@@ -177,7 +171,7 @@ class VidProc:
                 for f in self.mod_frames:
                     cv2.putText(
                         f,
-                        str(frame_num) + " | " + str((frame_num - self.START) / 60),
+                        str(frame_num),
                         self.bLCornerText,
                         self.font,
                         self.fScale,
@@ -185,12 +179,13 @@ class VidProc:
                         self.lineThickness,
                         cv2.LINE_AA,
                     )
-                    self.out_caps[viewport_num].write(f)
+                    self.out_caps.write(f)
+                    viewport_num += 1
                     cv2.imshow(
-                        self.out_fname + "_VIEWPORT_" + str(viewport_num + 1) + ".mp4",
+                        self.out_fname,
                         f,
                     )
-                    viewport_num += 1
+
             else:
                 cv2.putText(
                     frame,
@@ -203,7 +198,7 @@ class VidProc:
                     cv2.LINE_AA,
                 )
                 self.out_cap.write(frame)
-                cv2.imshow(self.out_fname.replace("_RES.mp4", ""), frame)
+                cv2.imshow(self.out_fname, frame)
 
             keyPress = cv2.waitKey(1) & 0xFF
             """
@@ -220,6 +215,6 @@ class VidProc:
             frame_num += 1
             pbar.update(1)
 
-        vid = mp.editor.VideoFileClip(self.out_fname + "_VIEWPORT_1" + ".mp4")
+        vid = mp.editor.VideoFileClip(self.out_fname)
         self.duration = int(vid.duration)
         pbar.close()
