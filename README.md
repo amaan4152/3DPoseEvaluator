@@ -6,7 +6,7 @@ as the 3D monocular pose estimation algorithms. Evaluate the 3D pose data agains
 OTS data to generate a comparison study. The 3D pose data is evaluated via the Mean Per Joint Position Error (MPJPE)
 and Percent Joints Detected (PJD) to compare between the various 3D pose estimation algorithms. 
 
-## Installation 
+## Installation and Setup
 GAIT analysis OTS and IMU data provided by NIST are in the data folder. 
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
@@ -34,4 +34,9 @@ GAIT analysis OTS and IMU data provided by NIST are in the data folder.
 Extra flags of interest (all flags have to be after `docker run` and preceed the name of the image: 
  - `--rm`: remove the container when its job is done 
  - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
-    
+   
+ 5. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
+    1. `THETA`: joint angle
+    2. `POS-X`: x-coordinate
+    3. `POS-Y`: y-coordinate
+    4. `POSE-Z`: z-coordinate
