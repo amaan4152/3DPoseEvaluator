@@ -32,6 +32,6 @@ GAIT analysis OTS and IMU data provided by NIST are in the data folder.
 
 
 Extra flags of interest (all flags have to be after `docker run` and preceed the name of the image: 
-    - `--rm`: remove the container when its job is done 
-    - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+ - `--rm`: remove the container when its job is done 
+ - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
     
