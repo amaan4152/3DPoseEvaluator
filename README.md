@@ -8,5 +8,12 @@ and Percent Joints Detected (PJD) to compare between the various 3D pose estimat
 
 ## Installation 
 <ol>
-    <li>Install docker into system: https://docs.docker.com/get-docker/</li>
+    <li>
+        Install docker into system: https://docs.docker.com/get-docker/<br>
+        Check if docker CLI is available and ready:<br>
+        <code>
+        docker --version
+        </code>
+    </li>
+    <li>Clone this github repository</li>
 </ol>
