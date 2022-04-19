@@ -18,7 +18,7 @@ GAIT analysis OTS and IMU data provided by NIST are in the data folder.
     Make sure to be inside this repository or else the Dockerfile will not be detected. The `--compress` tag compresses the image we are going to build. `-t` flag requires the name of the image we want to build, in this case the image name is **eval-tool/test:latest**; `--target` flag is to specify up to what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**, which is the last sublayer in the Dockerfile. To check the existanc of the image: `docker images`
  4. Given that the image has been built, execute the pose evaluator: 
     ```
-    docker run --shm-size 10G --volume (pwd):/home -it eval-tool/test VIDEO=<video path> MODEL=VIBE START=<start frame> END=<end frame>
+    docker run --shm-size 10G --volume <abs path to working dir>:/home -it eval-tool/test VIDEO=<video path> MODEL=VIBE START=<start frame> END=<end frame>
     ```
     This will generate an unamed container, mount the current working directory (you have to be inside the repository) to the container, and interactively interact with it providing it CLI arguments that are necessary for the pose evaluator to run. Here is the breakdown of the command:
     - `--shm-size <MEMORY SIZE>`: adjusts the amount of RAM allocated for the temporary filesystem that the container will use, adjust as necessary based on host machine specs. If there are memory errors that occur, increase the memory size. 
