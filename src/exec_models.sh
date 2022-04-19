@@ -16,30 +16,28 @@ do
         VIBE)
             printf "\n ----- \e[3mInitiating\e[0;1;96m VIBE \e[0m----- \n\n"
 
-            cd "./src/VIBE/" || exit 1
-            source vibe-env/bin/activate
+            cd "/root/VIBE/" || exit 1
+            # source vibe-env/bin/activate
             # for docker:
-            # pyenv activate vibe-env
-            python3 demo.py --vid_file "../../${VNAME}" --output_folder "output/" --no_render   
+            pyenv activate vibe-env
+            # provide absolute path for video file!
+            # for docker: had to decrease tracker_batch_size (12 -> 8) due to mem issues
+            python3 demo.py --vid_file "${VNAME}" --output_folder "output/" --no_render --tracker_batch_size 1 --tracker_batch_size 2 --vibe_batch_size 64
+            VNAME="$(basename ${VNAME})"
             PKL_PATH=$(realpath "./output/${VNAME//".mp4"}/vibe_output.pkl")
             echo "$PKL_PATH"
             ;;
 
         GAST)
             printf "\n ----- \e[3mInitiating\e[0;1;35m GAST \e[0m----- \n\n"
-            cd "./src/GAST-Net-3DPoseEstimation/" || exit 1
-            pyenv activate gast_env
+            cd "/root/GAST-Net-3DPoseEstimation/" || exit 1
+            # pyenv activate gast_env
             # for docker:
-            # pyenv activate gast-env
+            pyenv activate gast-env
             python3 gen_skes.py -v "$VNAME" -np "$POSE_NUM"
             NPZ_PATH=$(find "./output/" -name "${VNAME//".mp4"/}.npz")
             NPZ_PATH=$(realpath "$NPZ_PATH")
             echo "$NPZ_PATH"
-            ;;
-
-        *)
-            echo -e "${RED}ERROR$NORMAL: Invalid argument passed"    
-            exit 1     
             ;;
     esac
 done

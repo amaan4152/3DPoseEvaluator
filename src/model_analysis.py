@@ -55,7 +55,7 @@ BLAZEPOSE_JOINTS = {
 }
 
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
-src_dir = "./src"
+src_dir = "../root"
 
 
 def get_vec(p1, p2):
@@ -116,7 +116,7 @@ def get_poseData(video, model, sframe, fframe):
             )
             if b_vibe_gen in ("Y", "y"):
                 vproc = sp.Popen(
-                    [f"{src_dir}/exec_models.sh", "VIBE", video], stdout=sp.PIPE
+                    [f"./src/exec_models.sh", "VIBE", video], stdout=sp.PIPE
                 )
                 pkl_file = get_dataFile(vproc, ".pkl")
 
@@ -179,7 +179,7 @@ def get_poseData(video, model, sframe, fframe):
                     f"{src_dir}/GAST-Net-3DPoseEstimation/data/video/",
                 )
                 gproc = sp.Popen(
-                    [f"{src_dir}/exec_models.sh", "GAST", video.split("/")[-1]],
+                    ["./src/exec_models.sh", "GAST", video.split("/")[-1]],
                     stdout=sp.PIPE,
                 )
                 npz_file = get_dataFile(gproc, ".npz")
