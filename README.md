@@ -7,22 +7,16 @@ OTS data to generate a comparison study. The 3D pose data is evaluated via the M
 and Percent Joints Detected (PJD) to compare between the various 3D pose estimation algorithms. 
 
 ## Installation 
-<ol>
-    <li>
-        Install docker into system: https://docs.docker.com/get-docker/<br>
-        Check if docker CLI is available and ready: <code>docker --version</code>
-    </li>
-    <li>Clone this github repository</li>
-    <li>
-        A docker image is required to generate containers for pose estimation <br>
-        experiemnts. Thus, we are going to build our own image based on the <br>
-        Dockerfile in this repository: <br>
-        <code>sudo docker build . --compress -t eval-tool/test:latest --target add-vibe</code> <br>
-        Make sure to be inside this repository or else the Dockerfile will not be <br>
-        detected. The `--compress` tag compresses the image we are going to build. <br>
-        `-t` flag requires the name of the image we want to build, in this case the <br>
-        image name is **eval-tool/test:latest**; `--target` flag is to specify up to <br>
-        what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**,<br>
-        which is the last sublayer in the Dockerfile. 
-    </li>
-</ol>
+ 1. Install docker into system: https://docs.docker.com/get-docker/<br>
+    Check if docker CLI is available and ready: <code>docker --version</code>
+ 2. Clone this github repository
+ 3. A docker image is required to generate containers for pose estimation <br>
+    experiemnts. Thus, we are going to build our own image based on the <br>
+    Dockerfile in this repository: <br>
+    <code>sudo docker build . --compress -t eval-tool/test:latest --target add-vibe</code> <br>
+    Make sure to be inside this repository or else the Dockerfile will not be <br>
+    detected. The `--compress` tag compresses the image we are going to build. <br>
+    `-t` flag requires the name of the image we want to build, in this case the <br>
+    image name is **eval-tool/test:latest**; `--target` flag is to specify up to <br>
+    what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**,<br>
+    which is the last sublayer in the Dockerfile. 
