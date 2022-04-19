@@ -1,0 +1,32 @@
+{
+    "LEFT_HIP": {
+        "GAST": 4,
+        "VIBE": 12,
+        "BLAZEPOSE": 23
+    },
+    "LEFT_KNEE": {
+        "GAST": 5,
+        "VIBE": 13,
+        "BLAZEPOSE": 25
+    },
+    "LEFT_ANKLE": {
+        "GAST": 6,
+        "VIBE": 14,
+        "BLAZEPOSE": 27
+    },
+    "RIGHT_HIP": {
+        "GAST": 1,
+        "VIBE": 0,
+        "BLAZEPOSE": 24
+    },
+    "RIGHT_KNEE": {
+        "GAST": 2,
+        "VIBE": 1,
+        "BLAZEPOSE": 26
+    },
+    "RIGHT_ANKLE": {
+        "GAST": 3,
+        "VIBE": 1,
+        "BLAZEPOSE": 28
+    }
+}

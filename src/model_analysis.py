@@ -1,5 +1,5 @@
 import joblib as jb
-
+import json
 import cv2
 from cv2 import (
     VideoCapture,
@@ -17,42 +17,6 @@ import pyquaternion as pq
 from shutil import copy
 import subprocess as sp
 from tqdm import tqdm
-
-GAST_JOINTS = {
-    "PELVIS": 0,
-    "RIGHT_HIP": 1,
-    "RIGHT_KNEE": 2,
-    "RIGHT_ANKLE": 3,
-    "LEFT_HIP": 4,
-    "LEFT_KNEE": 5,
-    "LEFT_ANKLE": 6,
-    "SPINE": 7,
-    "THORAX": 8,
-    "NECK": 9,
-    "HEAD": 10,
-    "LEFT_SHOULER": 11,
-    "LEFT_ELBOW": 12,
-    "LEFT_WRIST": 13,
-    "RIGHT_SHOULDER": 14,
-    "RIGHT_ELBOW": 15,
-    "RIGHT_WRIST": 16,
-}
-
-BLAZEPOSE_JOINTS = {
-    "RIGHT_HIP": 24,
-    "RIGHT_KNEE": 26,
-    "RIGHT_ANKLE": 28,
-    "LEFT_HIP": 23,
-    "LEFT_KNEE": 25,
-    "LEFT_ANKLE": 27,
-    "HEAD": 0,  # nose
-    "LEFT_SHOULER": 11,
-    "LEFT_ELBOW": 13,
-    "LEFT_WRIST": 15,
-    "RIGHT_SHOULDER": 12,
-    "RIGHT_ELBOW": 14,
-    "RIGHT_WRIST": 16,
-}
 
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
 src_dir = "../root"
@@ -93,6 +57,32 @@ FEATURES TO ADD:
 - choose what joints to extract raw pose data from
     - must have same format and share same joints
 """
+
+"""
+from models.gast.parse_gast import parse_gast
+from models.vibe.parse_vibe import parse_vibe
+
+def get_pose(model, video, sframe, fframe, st_pose_file):
+    # joints will be preconfigured for now
+    joints = ["RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"]
+
+    f = open('/src/cfg_joints.json')
+
+    pose_file = st_pose_file["file"]
+    if not pose_file: 
+        vproc = sp.Popen(
+            [f"./src/{model}.sh", video], stdout=sp.PIPE
+        )
+        pose_file = get_dataFile(vproc, st_pose_file["type"])
+
+    joint_angle = {}
+    quat = {}
+    HIP_pos = {}
+    KNEE_pos = {}
+    ANKL_pos = {}
+    joint_map = json.load(f)
+    for frame_num in range(0, len()):
+"""     
 
 
 def get_poseData(video, model, sframe, fframe):

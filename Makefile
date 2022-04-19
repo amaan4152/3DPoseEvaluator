@@ -5,7 +5,7 @@ DATA=data/GAIT_noexo_00.csv
 	all pretty clean
 
 all: 
-	@python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END)
+	@python3 $(PROG) -v /home/$(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END)
 
 pretty:
 	@black src/*.py

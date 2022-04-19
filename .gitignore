@@ -6,3 +6,4 @@ src/GAST-Net-3DPoseEstimation/
 src/VIBE/
 src/traj-dist/
 .vscode/
+raw_data.csv

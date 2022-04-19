@@ -62,3 +62,6 @@ RUN source ~/.bashrc && \
     pip install gdown
 RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
 RUN source scripts/prepare_data.sh
+WORKDIR /home/
+
+ENTRYPOINT ["make", "all"]
