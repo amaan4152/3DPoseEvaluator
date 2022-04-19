@@ -15,7 +15,7 @@ def MPJPE(ots_joints, model_joints):
         model_joints[j] = model_joints[j].to_numpy(copy=True)
         ots_joints[j] = ots_joints[j].to_numpy(copy=True)
         diff = model_joints[j] - ots_joints[j]
-        exp = diff ** 2
+        exp = diff**2
         d = np.sqrt(exp.sum(axis=1))
         tot = d.size
         mpjpe_dat.at[j] = d.sum(axis=0) / tot
@@ -29,7 +29,7 @@ def PDJ(ots_joints, model_joints, torso_diam):
         model_joints[j] = model_joints[j].to_numpy(copy=True)
         ots_joints[j] = ots_joints[j].to_numpy(copy=True)
         diff = model_joints[j] - ots_joints[j]
-        exp = diff ** 2
+        exp = diff**2
         d = np.sqrt(exp.sum(axis=1))
         tot = d.size
         if (d.sum() / tot) < (0.2 * torso_diam):

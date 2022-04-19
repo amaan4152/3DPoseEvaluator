@@ -82,7 +82,7 @@ def get_pose(model, video, sframe, fframe, st_pose_file):
     ANKL_pos = {}
     joint_map = json.load(f)
     for frame_num in range(0, len()):
-"""     
+"""
 
 
 def get_poseData(video, model, sframe, fframe):

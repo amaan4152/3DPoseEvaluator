@@ -11,3 +11,5 @@ pretty:
 	@black src/*.py
 	@flake8 --ignore=E,W src/*.py
 
+clean: 
+	@rm -rf output/*

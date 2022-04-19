@@ -7,3 +7,4 @@ src/VIBE/
 src/traj-dist/
 .vscode/
 raw_data.csv
+.venv/

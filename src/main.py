@@ -41,9 +41,11 @@ def main():
     # generate raw data
     duration = get_duration(args.video)
     print(f"Duration: {duration}")
-    df_raw = pose_gen(args.video, args.data, args.model, args.start, args.end, joints, duration)
-    df_raw.to_csv("raw_data.csv")
+    df_raw = pose_gen(
+        args.video, args.data, args.model, args.start, args.end, joints, duration
+    )
+    df_raw.to_csv("output/raw_data.csv")
 
-    
+
 if __name__ == "__main__":
     main()
