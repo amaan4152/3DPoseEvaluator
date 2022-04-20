@@ -1,4 +1,4 @@
-# NIST 3D Pose Estimation Evaluator
+# 3D Pose Estimation Evaluator
 
 ## Description
 Generate 3D pose data from an arbitrary video sequence utilizing GAST-NET, VIBE, and Blazepose
@@ -7,7 +7,7 @@ OTS data to generate a comparison study. The 3D pose data is evaluated via the M
 and Percent Joints Detected (PJD) to compare between the various 3D pose estimation algorithms. 
 
 ## Installation and Setup
-GAIT analysis OTS and IMU data provided by NIST are in the data folder. 
+GAIT analysis OTS and IMU data are in the data folder. 
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
  2. Clone this github repository. Create an **output** folder inside the repository. If you want, you could also create a video directory to store all your necessary video files for analysis.
