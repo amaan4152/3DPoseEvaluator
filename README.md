@@ -11,7 +11,45 @@ GAIT analysis OTS and IMU data are in the data folder.
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
  2. Clone this github repository. Create an **output** folder inside the repository. If you want, you could also create a video directory to store all your necessary video files for analysis.
- 3. A docker image is required to generate containers for pose estimation experiemnts. Thus, we are going to build our own image based on the Dockerfile in this  repository: <br>
+ 3. Make 2 directories: 
+    - `output`: directory that will contain all results after successful execution
+    - `videos`: directory with all video files used for analysis  
+ 
+ 4. Make sure to be at the top of the repository directory from here on out. The tree structure from the top and 2 levels deep should be as follows: 
+    ```
+    .
+    ├── data
+    │   └── GAIT_noexo_00.csv
+    ├── output
+    │   └── raw_data.csv
+    ├── scripts
+    │   └── init_pyenv.sh
+    ├── src
+    │   ├── __pycache__
+    │   ├── models
+    │   ├── cfg_joints.json
+    │   ├── data_parser.py
+    │   ├── edr.py
+    │   ├── evaluate.py
+    │   ├── exec_models.sh
+    │   ├── gast-requirements.txt
+    │   ├── main.py
+    │   ├── model_analysis.py
+    │   ├── pose_eval.py
+    │   ├── pose_gen.py
+    │   ├── truth_analysis.py
+    │   └── vid_proc.py
+    ├── videos
+    │   └── SAMPLE_VIDEO_FILE
+    ├── Dockerfile
+    ├── Makefile
+    ├── README.md
+    ├── dir_struct.txt
+    ├── poetry.lock
+    └── pyproject.toml
+
+    ```
+ 6. A docker image is required to generate containers for pose estimation experiments. Thus, we are going to build our own image based on the Dockerfile in this  repository: <br>
     ```
     docker build . --compress -t eval-tool/test:latest --target add-vibe
     ```
