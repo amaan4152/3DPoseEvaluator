@@ -54,7 +54,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     ```
     docker build . --compress -t eval-tool/test:latest --target add-vibe
     ```
-    Make sure to be inside this repository or else the Dockerfile will not be detected. The `--compress` tag compresses the image we are going to build. `-t` flag requires the name of the image we want to build, in this case the image name is **eval-tool/test:latest**; `--target` flag is to specify up to what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**, which is the last sublayer in the Dockerfile. To check the existanc of the image: `docker images`
+    Make sure to be inside this repository or else the Dockerfile will not be detected. The `--compress` tag compresses the image we are going to build. `-t` flag requires the name of the image we want to build, in this case the image name is **eval-tool/test:latest**; `--target` flag is to specify up to what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**, which is the last sublayer in the Dockerfile. To check the existence of the image: `docker images`
  6. Given that the image has been built, execute the pose evaluator: 
     ```
     docker run --shm-size 10G --volume <abs path to working dir>:/home -it eval-tool/test VIDEO=<video path> MODEL=VIBE START=<start frame> END=<end frame>
