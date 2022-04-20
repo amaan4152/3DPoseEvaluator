@@ -13,7 +13,7 @@ GAIT analysis OTS and IMU data are in the data folder.
  2. Clone this github repository. Create an **output** folder inside the repository. If you want, you could also create a video directory to store all your necessary video files for analysis.
  3. Make 2 directories: 
     - `output`: directory that will contain all results after successful execution
-    - `videos`: directory with all video files used for analysis  
+    - `videos`: directory with all video files used for analysis. Make sure to store all videos in this directory or else the build will fail
  
  4. Make sure to be at the top of the repository directory from here on out. The tree structure from the top and 2 levels deep should be as follows: 
     ```
@@ -49,12 +49,14 @@ GAIT analysis OTS and IMU data are in the data folder.
     └── pyproject.toml
 
     ```
- 6. A docker image is required to generate containers for pose estimation experiments. Thus, we are going to build our own image based on the Dockerfile in this  repository: <br>
+    - `raw_data.csv` will be inside the `output` directory after successful execution of the evaluator tool
+    - `SAMPLE_VIDEO_FILE` represents any video file that will be used for analysis. There can be multiple videos, but only 1 video can be selected for analysis as can be seen in **step 6**
+ 5. A docker image is required to generate containers for pose estimation experiments. Thus, we are going to build our own image based on the Dockerfile in this  repository: <br>
     ```
     docker build . --compress -t eval-tool/test:latest --target add-vibe
     ```
     Make sure to be inside this repository or else the Dockerfile will not be detected. The `--compress` tag compresses the image we are going to build. `-t` flag requires the name of the image we want to build, in this case the image name is **eval-tool/test:latest**; `--target` flag is to specify up to what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**, which is the last sublayer in the Dockerfile. To check the existanc of the image: `docker images`
- 4. Given that the image has been built, execute the pose evaluator: 
+ 6. Given that the image has been built, execute the pose evaluator: 
     ```
     docker run --shm-size 10G --volume <abs path to working dir>:/home -it eval-tool/test VIDEO=<video path> MODEL=VIBE START=<start frame> END=<end frame>
     ```
@@ -74,7 +76,7 @@ Extra flags of interest (all flags have to be after `docker run` and preceed the
  - `--rm`: remove the container when its job is done 
  - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
    
- 5. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
+ 7. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
     1. `THETA`: joint angle
     2. `POS-X`: x-coordinate
     3. `POS-Y`: y-coordinate
