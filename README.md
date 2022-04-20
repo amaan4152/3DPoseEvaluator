@@ -10,12 +10,12 @@ and Percent Joints Detected (PJD) to compare between the various 3D pose estimat
 GAIT analysis OTS and IMU data are in the data folder. 
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
- 2. Clone this github repository. Create an **output** folder inside the repository. If you want, you could also create a video directory to store all your necessary video files for analysis.
+ 2. Clone this github repository. Make sure to be at the top of the repository directory from here on out.
  3. Make 2 directories: 
     - `output`: directory that will contain all results after successful execution
     - `videos`: directory with all video files used for analysis. Make sure to store all videos in this directory or else the build will fail
  
- 4. Make sure to be at the top of the repository directory from here on out. The tree structure from the top and 2 levels deep should be as follows: 
+ 4. The tree structure from the top and 2 levels deep should be as follows: 
     ```
     .
     ├── data
