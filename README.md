@@ -44,7 +44,6 @@ GAIT analysis OTS and IMU data are in the data folder.
     ├── Dockerfile
     ├── Makefile
     ├── README.md
-    ├── dir_struct.txt
     ├── poetry.lock
     └── pyproject.toml
 
