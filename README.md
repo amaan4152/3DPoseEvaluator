@@ -64,7 +64,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     - `--volume <host dir>:<target dir in container>`: attach host directory to a target container directory
     - `-it`: permit an interactive process within the terminal on execution of the container
     - `eval-tool/test`: image name to run a container from
-    - `VIDEO=`: argument to specify video file to analyze. **Must** be absolute path to video file or the program will fail
+    - `VIDEO=`: argument to specify video file to analyze. Specify relative path!
     - `MODEL=`: argument to specify model. Support models are: `GAST`, `VIBE`, `BLAZEPOSE`
     - `START=`: argument to specify the frame to start analysis (must know prior to execution of pose evaluator)
     - `END=`: argument to specify the frame to end analysis (must know prior to execution of pose evaluator)
@@ -74,7 +74,13 @@ Extra flags of interest (all flags have to be after `docker run` and preceed the
  - `--named <container name>`: provide name of container to reaccess it again
  - `--rm`: remove the container when its job is done 
  - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
-   
+
+An example run of **step 6** with the example scenario in **step 4** without GPU compute and removing the container after execution:
+```
+docker run --rm --shm-size 10G --volume /home/users/student/3D-Pose-Evalulator/:/home -it eval-tool/test \
+           VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE START=600 END=1500
+```
+
  7. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
     1. `THETA`: joint angle
     2. `POS-X`: x-coordinate
