@@ -79,7 +79,6 @@ An example run of **step 6** with the example scenario in **step 4** without GPU
     ```
     docker run --rm --shm-size 10G --volume /home/users/student/3DPoseEvalulator:/home -it eval-tool/test:latest VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE START=600 END=1500
     ```
-
  7. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
     1. `THETA`: joint angle
     2. `POS-X`: x-coordinate
