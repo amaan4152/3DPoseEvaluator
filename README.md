@@ -75,7 +75,7 @@ Extra flags of interest (all flags have to be after `docker run` and preceed the
  - `--rm`: remove the container when its job is done 
  - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 
-An example run of **step 6** with the example scenario in **step 4** without GPU compute and removing the container after execution:
+An example run of **step 6** with the example scenario in **step 4** without GPU compute and removing the container after execution:  
     ```
     docker run --rm --shm-size 10G --volume /home/users/student/3DPoseEvalulator:/home -it eval-tool/test:latest VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE START=600 END=1500
     ```
