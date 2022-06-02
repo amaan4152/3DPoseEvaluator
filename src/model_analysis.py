@@ -19,7 +19,7 @@ import subprocess as sp
 from tqdm import tqdm
 
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
-src_dir = "../root"
+src_dir = "/root"
 
 
 def get_vec(p1, p2):
@@ -83,6 +83,57 @@ def get_pose(model, video, sframe, fframe, st_pose_file):
     joint_map = json.load(f)
     for frame_num in range(0, len()):
 """
+
+from models.ModelRegistry import ModelRegistry
+import json
+src = "./src"
+def get_poseData2(video : str, model_name : str, animate : bool):
+    # get joint indicies of `model_name`
+    MODEL_KEY = model_name.upper()
+    with open(f"{src}/models/cfg_joints.json", "r") as cfg_joints_file:
+        JOINT_KEYS = json.load(cfg_joints_file)
+    RIGHT_LEG_JOINTS = [
+        JOINT_KEYS['RIGHT_HIP'][MODEL_KEY],
+        JOINT_KEYS['RIGHT_KNEE'][MODEL_KEY],
+        JOINT_KEYS['RIGHT_ANKLE'][MODEL_KEY],
+    ]
+
+    # execute model and parse output data file(s)
+    MR = ModelRegistry()
+    output_files = MR.exec_model(model_name, video, animate)
+    model_data = MR.parse_data(model_name, output_files['data'])
+    print(f"{RIGHT_LEG_JOINTS=}")
+
+    # compose joint 3D position, joint angle, and joint quaternion data
+    model_joint_angle = [None] * len(model_data)
+    model_quat = [None] * len(model_data)
+    HIP_pos = [None] * len(model_data)
+    KNEE_pos = [None] * len(model_data)
+    ANKL_pos = [None] * len(model_data)
+    for frame_num in range(0, len(model_data)):
+        rhip = model_data[frame_num][RIGHT_LEG_JOINTS[0]]
+        rknee = model_data[frame_num][RIGHT_LEG_JOINTS[1]]
+        rankle = model_data[frame_num][RIGHT_LEG_JOINTS[2]]
+
+        rfemur = rknee - rhip
+        rtibia = rankle - rknee
+        estim_theta = 180 - joint_angle(rfemur, rtibia)
+        estim_axis = np.cross(rfemur, rtibia)
+        estim_quat = pq.Quaternion(axis=estim_axis, angle=estim_theta)
+        model_joint_angle[frame_num] = estim_theta
+        model_quat[frame_num] = (
+            estim_quat.elements[0],
+            estim_quat.elements[1],
+            estim_quat.elements[2],
+            estim_quat.elements[3],
+        )
+
+        HIP_pos[frame_num] = rhip
+        KNEE_pos[frame_num] = rknee
+        ANKL_pos[frame_num] = rankle
+
+    model_pos = [HIP_pos, KNEE_pos, ANKL_pos]
+    return model_pos, model_joint_angle, model_quat
 
 
 def get_poseData(video, model, sframe, fframe):
@@ -218,7 +269,7 @@ def get_poseData(video, model, sframe, fframe):
             mp_drawing = mp.solutions.drawing_utils
             mp_drawing_styles = mp.solutions.drawing_styles
 
-            fname = f"videos/Trial1cameraA_20190624.mp4"
+            fname = f"video-lib/nist_peg_test_sub01.mp4"
             print(fname)
             cap = VideoCapture(fname)
             h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))

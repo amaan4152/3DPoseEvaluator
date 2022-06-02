@@ -4,8 +4,14 @@ DATA=data/GAIT_noexo_00.csv
 .PHONY: 
 	all pretty clean
 
-all: 
-	@python3 $(PROG) -v /home/$(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END)
+all:
+ifeq ($(EVAL),True)
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END) --eval
+else ifeq ($(ANIMATE),True)
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END) --animate
+else
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END)
+endif
 
 pretty:
 	@black src/*.py

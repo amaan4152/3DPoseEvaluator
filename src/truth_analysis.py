@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import pyquaternion as pq
 
+VID_FPS = 60
 OTS_FPS = 120
 
 
@@ -9,12 +10,8 @@ def str_has(string, *args):
     return any([marker_label in string for marker_label in set(args)])
 
 
-def get_OTSData(file, test_type, sframe, vid_duration):
+def get_OTSData(file, test_type, sframe, fframe):
     print("===== OTS DATA EXTRACTION =====")
-    FEM_quat = {}
-    TIB_quat = {}
-    OTS_jangle = {}
-    OTS_quat = {}
 
     skipped_frames = []
     OTS_data = pd.read_csv(file, skiprows=3, dtype="unicode")
@@ -31,20 +28,24 @@ def get_OTSData(file, test_type, sframe, vid_duration):
             POS_data.append(col_dat)
 
     # get the index of the rows that contains the start frame # data and the end frame # data
-    frame_stats = (int(sframe * 2 - 1), int((sframe * 2 - 1) + vid_duration * OTS_FPS))
-    print(f"Frame stats: {frame_stats}")
+    frame_stats = (int(sframe/VID_FPS) * OTS_FPS, int(fframe/VID_FPS) * OTS_FPS)
     ind = OTS_data.index[
         (OTS_data.iloc[:, 0] == str(frame_stats[0]))
         | (OTS_data.iloc[:, 0] == str(frame_stats[1]))
     ].tolist()
-
+    print(f"{ind=}")
+    
     # extract quaternion information of FEMUR and TIBIA artifacts between the start frame # and the end frame #
     # extract joint positional data for each joint in the left leg
-    HIP_pos = {}
-    KNEE_pos = {}
-    ANKL_pos = {}
+    FEM_quat = [None] * (ind[1] - ind[0])
+    TIB_quat = [None] * (ind[1] - ind[0])
+    OTS_jangle = [None] * (ind[1] - ind[0])
+    OTS_quat = [None] * (ind[1] - ind[0])
+    HIP_pos = [None] * (ind[1] - ind[0])
+    KNEE_pos = [None] * (ind[1] - ind[0])
+    ANKL_pos = [None] * (ind[1] - ind[0])
     torso_width = []
-    for i in range(ind[0], ind[1]):
+    for i in range(ind[0] - 1, ind[1] - 1):
         if any(
             QUAT_data[col_num].values[i] == "NULL"
             for col_num in range(0, len(QUAT_data))
@@ -99,9 +100,9 @@ def get_OTSData(file, test_type, sframe, vid_duration):
             rknee_avg = ((rknee_out + rknee_in) / 2) - root_origin
             rankl_avg = ((rankl_out + rankl_in) / 2) - root_origin
 
-            HIP_pos[str(i - ind[0])] = rf_waist
-            KNEE_pos[str(i - ind[0])] = rknee_avg
-            ANKL_pos[str(i - ind[0])] = rankl_avg
+            HIP_pos[i - ind[0]] = rf_waist
+            KNEE_pos[i - ind[0]] = rknee_avg
+            ANKL_pos[i - ind[0]] = rankl_avg
 
         quat_fem = pq.Quaternion(
             QUAT_data[3].values[i],
@@ -120,21 +121,21 @@ def get_OTSData(file, test_type, sframe, vid_duration):
         quat_joint = quat_fem.conjugate * quat_tib
         # joint angle: .degrees = abs(2 * atan2d(norm(q(1:3), q(4))))
         # q(1:3) => imaginary components; q(4) => real component
-        OTS_jangle[str(i - ind[0])] = 180 - np.abs(quat_joint.degrees)
+        OTS_jangle[i - ind[0]] = 180 - np.abs(quat_joint.degrees)
 
-        FEM_quat[str(i - ind[0])] = (
+        FEM_quat[i - ind[0]] = (
             quat_fem.elements[0],
             quat_fem.elements[1],
             quat_fem.elements[2],
             quat_fem.elements[3],
         )
-        TIB_quat[str(i - ind[0])] = (
+        TIB_quat[i - ind[0]] = (
             quat_tib.elements[0],
             quat_tib.elements[1],
             quat_tib.elements[2],
             quat_tib.elements[3],
         )
-        OTS_quat[str(i - ind[0])] = (
+        OTS_quat[i - ind[0]] = (
             quat_joint.elements[0],
             quat_joint.elements[1],
             quat_joint.elements[2],

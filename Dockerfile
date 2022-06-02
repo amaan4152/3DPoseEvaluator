@@ -46,8 +46,7 @@ RUN cd checkpoint/gastnet && \
 
 
 FROM pyenv-config as add-vibe
-COPY --from=add-gast /root/.bashrc /root/.bashrc
-COPY --from=add-gast /root/.pyenv /root/
+COPY --from=add-gast /root /root
 WORKDIR /root
 SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/mkocabas/VIBE.git /root/VIBE
@@ -64,4 +63,4 @@ RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
 RUN source scripts/prepare_data.sh
 WORKDIR /home/
 
-ENTRYPOINT ["make", "all"]
+# ENTRYPOINT [ "make", "all" ]
