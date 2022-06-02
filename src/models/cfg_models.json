@@ -1,0 +1,35 @@
+{
+    "gast": {
+        "dirname": "GAST-Net-3DPoseEstimation",
+        "cmd": "python3 gen_skes.py",
+        "vid_flag" : "-v",
+        "video_path_type": "name",
+        "animation_flag" : "--aniamtion",
+        "no_animation_flag" : "",
+        "flags": {
+            "-v" : "",
+            "-np" : 1
+        }, 
+        "output_dir": "output/",
+        "output_dataFormats": "npz",
+        "output_videoFormats": "mp4"
+    },
+    "vibe": {
+        "dirname": "VIBE", 
+        "cmd": "python3 demo.py",
+        "vid_flag" : "--vid_file",
+        "video_path_type": "absolute",
+        "animation_flag" : "",
+        "no_animation_flag" : "--no_render",
+        "flags": {
+            "--vid_file" : "",
+            "--output_folder" : "output/",
+            "--no_render" : "",
+            "--tracker_batch_size" : 1,
+            "--vibe_batch_size" : 64
+        },
+        "output_dir": "output/",
+        "output_dataFormats": "pkl",
+        "output_videoFormats": "mp4"
+    }
+}
