@@ -102,7 +102,6 @@ def get_poseData2(video : str, model_name : str, animate : bool):
     MR = ModelRegistry()
     output_files = MR.exec_model(model_name, video, animate)
     model_data = MR.parse_data(model_name, output_files['data'])
-    print(f"{RIGHT_LEG_JOINTS=}")
 
     # compose joint 3D position, joint angle, and joint quaternion data
     model_joint_angle = [None] * len(model_data)

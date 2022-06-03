@@ -1,5 +1,6 @@
 import argparse as ap
 from pose_gen import pose_gen
+import matplotlib.pyplot as plt 
 import numpy as np
 import pandas as pd
 
@@ -85,25 +86,65 @@ def cli_parse():
 
     return pcli, pcli.parse_args()
 
+import matplotlib.ticker as ticker
+import os
+import seaborn as sns
+sns.set()
+def generate_plots(vid_name : str):
+    subdf = lambda df,substr : df.iloc[:, df.columns.str.contains(substr)]
+
+    df_list = {'JA': [], 'JOINTS': [], 'MODELS': []}
+    data_files = [f for f in os.listdir("output/") if "raw_data" in f and vid_name in f]
+    for file in data_files:
+        df_raw = pd.read_csv(f"output/{file}")
+        df_JA = subdf(df_raw, "theta")  # joint angle dataframe
+        attr = np.array([col_name.split(':') for col_name in df_JA.columns])
+        df_list['JA'].append(df_JA)
+        df_list['JOINTS'] = attr[:, 1]
+        df_list['MODELS'].append(*attr[:, 0].flatten())
+
+    for j in df_list['JOINTS']:
+        df_models = pd.concat([df[f"{m}:{j}:theta"] for df, m in zip(df_list['JA'], df_list['MODELS'])], axis=1)
+        print(df_models)
+        plt.figure(figsize=(19, 9))
+        ax = sns.lineplot(data=df_models)
+        plt.legend(labels=df_list["MODELS"])
+        plt.title(f"{j} Joint Models Plot")
+        plt.xlabel("Frame ID");
+        plt.ylabel(r'$\theta(^{\circ})$')
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(20))
+        ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+        plt.xlim(left=-10)
+        plt.tight_layout()
+        plt.savefig(f"output/{j.upper()}_JOINTANGLE_PLOT.png")
+        plt.close()
+
+
+from pathlib import Path
 from pose_eval import calibrate, align
+from edr import edr
 def main():
+    # parse CLI arguments
     pcli, args = cli_parse()
-    if None in (args.model, args.video, args.data):
+    if None in (args.model, args.video):
         print("ERROR: must provide arguments for '-m' and '-v'\n")
         pcli.print_help()
         exit(1)
 
     joints = {"KNEE": ["HIP", "KNEE", "ANKLE"]}
 
-    duration = get_duration(args.video)
-    print(f"Duration: {duration}")
+    # duration = get_duration(args.video)
+    # print(f"Duration: {duration}")
 
     # pose raw data generation
     if not args.eval:
-        df_raw, df_ots_raw, df_m_raw = pose_gen(
-            args.video, args.data, args.model.lower(), args.animate, args.start, args.end, joints, duration
+        mod_name = args.model.lower()
+        vid_name = Path(args.video).name.lower()
+        df_raw = pose_gen(
+            args.video, None, mod_name, args.animate, None, None, joints, None
         )
-        df_raw.to_csv("output/raw_data.csv")
+        df_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
+        generate_plots(vid_name)
 
     # pose evaluation
     else:
@@ -123,7 +164,13 @@ def main():
         df_m_aligned.to_csv("output/aligned_data.csv")
         df_cal = pd.concat([df_ots_raw, df_m_cal], axis=1)
         df_cal.to_csv("output/cal_data.csv")
-
+        dist, ix, iy = edr(df_cal.iloc[:, 0], df_cal.iloc[:, 11], 0.1)
+        print(ix.shape)
+        print(iy.shape)
+        plt.plot(np.arange(1, df_cal.shape[0] + 1), df_cal.iloc[:, 0].values)
+        plt.plot(iy.flatten(), df_cal.iloc[iy.flatten(), 11].values)
+        plt.savefig("output/JA_graph.png")
+        plt.close()
 
 if __name__ == "__main__":
     main()

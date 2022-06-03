@@ -6,11 +6,11 @@ DATA=data/GAIT_noexo_00.csv
 
 all:
 ifeq ($(EVAL),True)
-	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END) --eval
+	python3 $(PROG) -v $(VIDEO) -m $(MODEL) --eval
 else ifeq ($(ANIMATE),True)
-	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END) --animate
+	python3 $(PROG) -v $(VIDEO) -m $(MODEL) --animate
 else
-	python3 $(PROG) -v $(VIDEO) -d $(DATA) -t GAIT -m $(MODEL) --start $(START) --end $(END)
+	python3 $(PROG) -v $(VIDEO) -m $(MODEL)
 endif
 
 pretty:

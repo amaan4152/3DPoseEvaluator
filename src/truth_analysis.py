@@ -10,7 +10,7 @@ def str_has(string, *args):
     return any([marker_label in string for marker_label in set(args)])
 
 
-def get_OTSData(file, test_type, sframe, fframe):
+def get_OTSData(file, sframe, fframe):
     print("===== OTS DATA EXTRACTION =====")
 
     skipped_frames = []
@@ -21,7 +21,7 @@ def get_OTSData(file, test_type, sframe, fframe):
     for col in range(0, len(OTS_data.columns)):
         col_dat = OTS_data.iloc[:, col]
         if col_dat.values[0] == "Rotation":
-            if test_type is None or str_has(col_dat.name, "RThigh", "RShin"):
+            if str_has(col_dat.name, "RThigh", "RShin"):
                 QUAT_data.append(col_dat)
 
         elif str_has(col_dat.name, "WaistLFront", "WaistRFront", "RKnee", "RAnkle"):
@@ -50,8 +50,7 @@ def get_OTSData(file, test_type, sframe, fframe):
             QUAT_data[col_num].values[i] == "NULL"
             for col_num in range(0, len(QUAT_data))
         ) or (
-            (test_type is not None)
-            and any(
+            any(
                 POS_data[col_num].values[i] == "NULL"
                 for col_num in range(0, len(POS_data))
             )
@@ -60,49 +59,48 @@ def get_OTSData(file, test_type, sframe, fframe):
             skipped_frames.append(str(i - ind[0]))
             continue
 
-        if test_type is not None:
-            lf_waist = np.array(
-                [float(POS_data[0][i]), float(POS_data[1][i]), float(POS_data[2][i])]
-            )
-            rf_waist = np.array(
-                [float(POS_data[3][i]), float(POS_data[4][i]), float(POS_data[5][i])]
-            )
-            diff = lf_waist - rf_waist
-            torso_width.append(np.sqrt((np.sum(diff)) ** 2))
+        lf_waist = np.array(
+            [float(POS_data[0][i]), float(POS_data[1][i]), float(POS_data[2][i])]
+        )
+        rf_waist = np.array(
+            [float(POS_data[3][i]), float(POS_data[4][i]), float(POS_data[5][i])]
+        )
+        diff = lf_waist - rf_waist
+        torso_width.append(np.sqrt((np.sum(diff)) ** 2))
 
-            root_origin = (lf_waist + rf_waist) / 2
+        root_origin = (lf_waist + rf_waist) / 2
 
-            """
-            # uncomment this if you want to use left limbs (really not too different when switching between left and right limbs)
+        """
+        # uncomment this if you want to use left limbs (really not too different when switching between left and right limbs)
 
-            lknee_out = np.array([float(POS_data[6][i]), float(POS_data[7][i]), float(POS_data[8][i])])
-            lknee_in = np.array([float(POS_data[9][i]), float(POS_data[10][i]), float(POS_data[11][i])])
-            lankl_out = np.array([float(POS_data[12][i]), float(POS_data[13][i]), float(POS_data[14][i])])
-            lankl_in = np.array([float(POS_data[15][i]), float(POS_data[16][i]), float(POS_data[17][i])])
-            lf_waist = lf_waist - root_origin
-            lknee_avg = ((lknee_out + lknee_in)/2) - root_origin
-            lankl_avg = ((lankl_out + lankl_in)/2) - root_origin
-            """
+        lknee_out = np.array([float(POS_data[6][i]), float(POS_data[7][i]), float(POS_data[8][i])])
+        lknee_in = np.array([float(POS_data[9][i]), float(POS_data[10][i]), float(POS_data[11][i])])
+        lankl_out = np.array([float(POS_data[12][i]), float(POS_data[13][i]), float(POS_data[14][i])])
+        lankl_in = np.array([float(POS_data[15][i]), float(POS_data[16][i]), float(POS_data[17][i])])
+        lf_waist = lf_waist - root_origin
+        lknee_avg = ((lknee_out + lknee_in)/2) - root_origin
+        lankl_avg = ((lankl_out + lankl_in)/2) - root_origin
+        """
 
-            rknee_out = np.array(
-                [float(POS_data[6][i]), float(POS_data[7][i]), float(POS_data[8][i])]
-            )
-            rknee_in = np.array(
-                [float(POS_data[9][i]), float(POS_data[10][i]), float(POS_data[11][i])]
-            )
-            rankl_out = np.array(
-                [float(POS_data[12][i]), float(POS_data[13][i]), float(POS_data[14][i])]
-            )
-            rankl_in = np.array(
-                [float(POS_data[15][i]), float(POS_data[16][i]), float(POS_data[17][i])]
-            )
-            rf_waist = rf_waist - root_origin
-            rknee_avg = ((rknee_out + rknee_in) / 2) - root_origin
-            rankl_avg = ((rankl_out + rankl_in) / 2) - root_origin
+        rknee_out = np.array(
+            [float(POS_data[6][i]), float(POS_data[7][i]), float(POS_data[8][i])]
+        )
+        rknee_in = np.array(
+            [float(POS_data[9][i]), float(POS_data[10][i]), float(POS_data[11][i])]
+        )
+        rankl_out = np.array(
+            [float(POS_data[12][i]), float(POS_data[13][i]), float(POS_data[14][i])]
+        )
+        rankl_in = np.array(
+            [float(POS_data[15][i]), float(POS_data[16][i]), float(POS_data[17][i])]
+        )
+        rf_waist = rf_waist - root_origin
+        rknee_avg = ((rknee_out + rknee_in) / 2) - root_origin
+        rankl_avg = ((rankl_out + rankl_in) / 2) - root_origin
 
-            HIP_pos[i - ind[0]] = rf_waist
-            KNEE_pos[i - ind[0]] = rknee_avg
-            ANKL_pos[i - ind[0]] = rankl_avg
+        HIP_pos[i - ind[0]] = rf_waist
+        KNEE_pos[i - ind[0]] = rknee_avg
+        ANKL_pos[i - ind[0]] = rankl_avg
 
         quat_fem = pq.Quaternion(
             QUAT_data[3].values[i],
