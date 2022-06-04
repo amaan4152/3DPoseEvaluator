@@ -11,9 +11,10 @@ GAIT analysis OTS and IMU data are in the data folder.
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
  2. Clone this github repository. Make sure to be at the top of the repository directory from here on out.
- 3. Make 2 directories: 
+ 3. Make 1 directories: 
     - `output`: directory that will contain all results after successful execution
-    - `videos`: directory with all video files used for analysis. Make sure to store all videos in this directory or else the build will fail
+    
+ **_Note:_** store any videos for testing in the `videos` directory.
  
  4. The tree structure from the top and 2 levels deep should be as follows: 
     ```
@@ -85,7 +86,8 @@ An example run of **step 6** with the example scenario in **step 4** without GPU
     4. `POS-Z`: z-coordinate
  
     A file named `{PIVOT_JOINT}_JOINTANGLE_PLOT.png` will also be generated with the plot of the joint angle data for all executed algorithms with respect to the appropriate `PIVOT_JOINT` (e.g. _RKNEE_ for joint angle with right knee as vertex or pivot of joint angle). 
-
+    
+    **_Note:_** this tool works for tracking the right leg at the moment.
 ## Future Work
 - Comparison study between 3D pose data and Optical Tracking System (OTS) data
 - Align 3D pose data with OTS 
