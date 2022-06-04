@@ -57,30 +57,28 @@ GAIT analysis OTS and IMU data are in the data folder.
     Make sure to be inside this repository or else the Dockerfile will not be detected. The `--compress` tag compresses the image we are going to build. `-t` flag requires the name of the image we want to build, in this case the image name is **eval-tool/test:latest**; `--target` flag is to specify up to what layer in the Dockerfile we would like to build to, in this case it's **add-vibe**, which is the last sublayer in the Dockerfile that will build everything. To check the existence of the image: `docker images`
  6. Given that the image has been built, execute the pose evaluator: 
     ```
-    docker run --shm-size 10G --volume <abs path to working dir>:/home -it eval-tool/test:latest VIDEO=<video path> MODEL=VIBE START=<start frame> END=<end frame>
+    docker run --shm-size 10G --volume <abs path to working dir>:/home -it eval-tool/test:latest VIDEO=<video path> MODEL=VIBE
     ```
     This will generate an unamed container, mount the current working directory (you have to be inside the repository) to the container, and interactively interact with it providing it CLI arguments that are necessary for the pose evaluator to run. Here is the breakdown of the command:
     - `--shm-size <MEMORY SIZE>`: adjusts the amount of RAM allocated for the temporary filesystem that the container will use, adjust as necessary based on host machine specs. If there are memory errors that occur, increase the memory size. 
-    - `--volume <host dir>:<target dir in container>`: attach host directory to a target container directory
+    - `--volume <host dir>:<target dir in container>`: attach host directory to a target container directory. Make sure `host dir` is absolute path of current working        directory; if on a Linux environment, use `pwd` to get absolute path of current working directory. 
     - `-it`: permit an interactive process within the terminal on execution of the container
     - `eval-tool/test`: image name to run a container from
     - `VIDEO=`: argument to specify video file to analyze. Specify relative path!
     - `MODEL=`: argument to specify model. Support models are: `GAST`, `VIBE`, `BLAZEPOSE`
-    - `START=`: argument to specify the frame to start analysis (must know prior to execution of pose evaluator)
-    - `END=`: argument to specify the frame to end analysis (must know prior to execution of pose evaluator)
 
 
 Extra flags of interest (all flags have to be after `docker run` and preceed the name of the image): 
- - `--named <container name>`: provide name of container to reaccess it again
+ - `--named <container name>`: provide name of container to reaccess it again. **_Note:_** If you would like to debug inside the docker container, make sure to **comment** the last line of the `Dockerfile` and add `bash` at the end of command `6`.   
  - `--rm`: remove the container when its job is done 
  - `--gpus all`: given that you have a supported Linux distro, use this flag to utilize GPU compute capabilities. Setup guide for NVIDIA container toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 
 An example run of **step 6** with the example scenario in **step 4** without GPU compute and removing the container after execution:
 
-    docker run --rm --shm-size 10G --volume /home/users/student/3DPoseEvalulator:/home -it eval-tool/test:latest VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE START=600 END=1500
+    docker run --rm --shm-size 10G --volume /home/users/student/3DPoseEvalulator:/home -it eval-tool/test:latest VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE
     
- 7. A file named **raw_data.csv** will pop up in the `output` directory. The first set of columns is the OTS data and the latter set is the model's pose data. The data tag order is as follows for OTS and pose data: 
+ 7. A file named **{model}_raw_data.csv** will pop up in the `output` directory. The columns represent the model's pose data. The data tag order is as follows: 
     1. `THETA`: joint angle
     2. `POS-X`: x-coordinate
     3. `POS-Y`: y-coordinate
-    4. `POSE-Z`: z-coordinate
+    4. `POS-Z`: z-coordinate
