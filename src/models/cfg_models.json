@@ -1,6 +1,7 @@
 {
     "gast": {
         "dirname": "GAST-Net-3DPoseEstimation",
+        "env": "gast-env",
         "cmd": "python3 gen_skes.py",
         "vid_flag" : "-v",
         "video_path_type": "name",
@@ -16,6 +17,7 @@
     },
     "vibe": {
         "dirname": "VIBE", 
+        "env": "vibe-env",
         "cmd": "python3 demo.py",
         "vid_flag" : "--vid_file",
         "video_path_type": "absolute",
@@ -30,6 +32,21 @@
         },
         "output_dir": "output/",
         "output_dataFormats": "pkl",
+        "output_videoFormats": "mp4"
+    },
+    "blazepose": {
+        "dirname": "Blazepose", 
+        "env": "",
+        "cmd": "python3 exec_blazepose.py",
+        "vid_flag" : "-v",
+        "video_path_type": "absolute",
+        "animation_flag" : "--animate",
+        "no_animation_flag" : "",
+        "flags": {
+            "-v" : ""
+        }, 
+        "output_dir": "output/",
+        "output_dataFormats": "npz",
         "output_videoFormats": "mp4"
     }
 }

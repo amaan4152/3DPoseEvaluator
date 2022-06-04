@@ -14,7 +14,9 @@ def pose_gen(video, ots_file, model_type, animation, sframe, fframe, joints, dur
     '''
     MODEL_pos, MODEL_theta, MODEL_quat = get_poseData2(video, model_type, animation)
     model_data = {"theta": MODEL_theta, "pos": MODEL_pos, "quat": MODEL_quat}
-
+    if animation:
+        return None
+        
     df_m_raw = data_parse2(model_type, model_data, joints)  # raw pose data
     # df_raw = pd.concat([df_ots_raw, df_m_raw], axis=1)
 

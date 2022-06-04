@@ -46,6 +46,7 @@ RUN cd checkpoint/gastnet && \
 
 
 FROM pyenv-config as add-vibe
+ENV PYENV_VIRTUALENV_DISABLE_PROMPT 1
 COPY --from=add-gast /root /root
 WORKDIR /root
 SHELL ["/bin/bash", "-c"]
@@ -61,6 +62,8 @@ RUN source ~/.bashrc && \
     pip install gdown
 RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
 RUN source scripts/prepare_data.sh
+RUN mkdir /root/Blazepose /root/Blazepose/output 
+COPY src/models/exec_blazepose /root/Blazepose
 WORKDIR /home/
 
 # ENTRYPOINT [ "make", "all" ]

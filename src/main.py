@@ -8,6 +8,26 @@ MODELS = {"VIBE": "V", "GAST": "G", "BLAZEPOSE": "B"}
 
 import subprocess
 
+# https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKCYAN = '\033[96m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
+
+
+def logging(l_type : str, mssg : str):
+    log_type = {
+        'ERROR' : FAIL,
+        'WARNING' : WARNING,
+        'GOOD' : OKGREEN,
+    }
+    print(f"[{log_type[l_type]}{l_type}{ENDC}]: {mssg}")
+
 
 def get_duration(filename):
     # ref: https://stackoverflow.com/questions/3844430/how-to-get-the-duration-of-a-video-in-python
@@ -103,6 +123,7 @@ def generate_plots(vid_name : str):
         df_list['JOINTS'] = attr[:, 1]
         df_list['MODELS'].append(*attr[:, 0].flatten())
 
+    print(df_list['JOINTS'])
     for j in df_list['JOINTS']:
         df_models = pd.concat([df[f"{m}:{j}:theta"] for df, m in zip(df_list['JA'], df_list['MODELS'])], axis=1)
         print(df_models)
@@ -131,7 +152,7 @@ def main():
         pcli.print_help()
         exit(1)
 
-    joints = {"KNEE": ["HIP", "KNEE", "ANKLE"]}
+    joints = {"RKNEE": ["RHIP", "RKNEE", "RANKLE"]}
 
     # duration = get_duration(args.video)
     # print(f"Duration: {duration}")
@@ -143,8 +164,13 @@ def main():
         df_raw = pose_gen(
             args.video, None, mod_name, args.animate, None, None, joints, None
         )
-        df_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
-        generate_plots(vid_name)
+        if not args.animate:
+            df_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
+            generate_plots(vid_name)
+        else:
+            logging("WARNING", "No pose data and plot have been generated due to animation flag...")
+
+        logging("GOOD", "successful termination without error")
 
     # pose evaluation
     else:

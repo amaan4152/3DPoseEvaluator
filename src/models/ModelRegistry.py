@@ -80,12 +80,13 @@ class ModelRegistry:
         '''
         print(f"\n\t\t\t\t  ===== {self.__OKCYAN}{name.upper()}{self.__ENDC} =====\n")
         path_type = self.models[name]['video_path_type']
+        vid_name = Path(video).name
         if path_type == "absolute":
             video = Path(video).absolute()
         elif path_type == "relative":
             video = Path(video).relative_to(Path(f"/home/{self.models[name]['dirname']}"))
         elif path_type == "name":
-            video = Path(video).name
+            video = vid_name
 
         if animate: 
             a_flag = self.models[name]['animation_flag']
@@ -98,9 +99,7 @@ class ModelRegistry:
             else:
                 if no_a_flag != "" and no_a_flag in self.models[name]['flags'].keys():
                     self.models[name]['flags'].pop(no_a_flag)
-
         cmd = self.__make_cmd(name, video)
-        '''
         proc = sp.Popen(
             cmd,
             cwd=f"/root/{self.models[name]['dirname']}",
@@ -112,9 +111,8 @@ class ModelRegistry:
         if rc != 0:
             print(f"[{self.__FAIL}ERROR{self.__ENDC}]: 3D pose estimation algorithm failed execution.")
             exit(1)
-        '''
         
-        out_files = self.__get_output_files(name)
+        out_files = self.__get_output_files(name, vid_name.split('.')[0])
         if out_files["data"] == []:
             print(f"[{self.__FAIL}ERROR{self.__ENDC}]: No data output file(s) detected from algorithm, exiting...")
             exit(1)
@@ -136,7 +134,7 @@ class ModelRegistry:
         
 
     # get vid/data by most recently generated? (ls -t sort?)
-    def __get_output_files(self, name : str):
+    def __get_output_files(self, name : str, video_name : str):
         out_dir = f"/root/{self.models[name]['dirname']}/{self.models[name]['output_dir']}"
         dType_list = self.models[name]["output_dataFormats"]
         vType_list = self.models[name]["output_videoFormats"]
@@ -157,24 +155,31 @@ class ModelRegistry:
                     break
 
                 out_files = sorted(out_files, key=(lambda p : p.stat().st_mtime), reverse=True) # sort by most recent in modification time
-                outputs[key] = [str(p.absolute()) for p in out_files if p.is_file()][0]
-        
+                if key == "video":
+                    outputs[key] = [p.absolute() for p in out_files if p.is_file()]
+                else:
+                    outputs[key] = [str(p.absolute()) for p in out_files if p.is_file()][0]
+
         if outputs['video'] != []:
             for vid in outputs['video']:
-                copyfile(vid, f"/home/output/{name}-{vid.split('.')[0]}.{vid.split('.')[-1]}")
+                v_name = vid.name
+                copyfile(vid, f"/home/output/{name}-{video_name.lower()}-output.{v_name.split('.')[-1]}")
 
         return outputs
 
 
     def __make_cmd(self, name : str, video : str):
-        env_cmd = f"source /root/.bashrc; pyenv activate {name}-env"    # must source .bashrc for pyenv to work
+        env_cmd = self.models[name]["env"]
+        if env_cmd != "":
+            env_cmd = f"source /root/.bashrc; pyenv activate {env_cmd};"    # must source .bashrc for pyenv to work
+
         v_flag = self.models[name]["vid_flag"]          # get video flag for model
         self.models[name]["flags"][v_flag] = video      # set video flag to video path
         
         model_cmd = self.models[name]["cmd"]
         model_flags = ' '.join(' '.join((k, str(v))).rstrip() for (k, v) in self.models[name]['flags'].items())
         exec_cmd = ' '.join([model_cmd, model_flags])
-        main_cmd = '; '.join([env_cmd, exec_cmd])
+        main_cmd = ''.join([env_cmd, exec_cmd])
 
         return main_cmd
 

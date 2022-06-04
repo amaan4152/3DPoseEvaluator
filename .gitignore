@@ -1,10 +1,8 @@
 .python-version
+data/
 videos/
 video-lib/
 src/__pycache__/
-src/GAST-Net-3DPoseEstimation/
-src/VIBE/
-src/traj-dist/
 .vscode/
 raw_data.csv
 .venv/
