@@ -22,7 +22,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     ├── data
     │   └── GAIT_noexo_00.csv
     ├── output
-    │   └── raw_data.csv
+    │   └── model_raw_data.csv
     ├── scripts
     │   └── init_pyenv.sh
     ├── src
@@ -49,7 +49,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     └── pyproject.toml
 
     ```
-    - `raw_data.csv` will be inside the `output` directory after successful execution of the evaluator tool
+    - `model-sample_video_file-raw_data.csv` will be inside the `output` directory after successful execution of the evaluator tool for a given `model` and `SAMPLE_VIDEO_FILE`
     - `SAMPLE_VIDEO_FILE` represents any video file that will be used for analysis. There can be multiple videos, but only 1 video can be selected for analysis as can be seen in **step 6**
  5. A docker image is required to generate containers for pose estimation experiments. Thus, we are going to build our own image based on the Dockerfile in this  repository: <br>
     ```
