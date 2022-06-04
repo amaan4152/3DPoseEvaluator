@@ -66,6 +66,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     - `eval-tool/test`: image name to run a container from
     - `VIDEO=`: argument to specify video file to analyze. Specify relative path!
     - `MODEL=`: argument to specify model. Support models are: `GAST`, `VIBE`, `BLAZEPOSE`
+    - `ANIMATION=True`: **optional** argument to enable saving `MODEL` pose into video file in `output` directory
 
 
 Extra flags of interest (all flags have to be after `docker run` and preceed the name of the image): 
@@ -77,8 +78,16 @@ An example run of **step 6** with the example scenario in **step 4** without GPU
 
     docker run --rm --shm-size 10G --volume /home/users/student/3DPoseEvalulator:/home -it eval-tool/test:latest VIDEO=videos/SAMPLE_VIDEO_FILE MODEL=VIBE
     
- 7. A file named **{model}_raw_data.csv** will pop up in the `output` directory. The columns represent the model's pose data. The data tag order is as follows: 
+ 7. A file named `{model}-{video_name}-raw_data.csv` will pop up in the `output` directory for the respective `model` that has been executed for the provided `video_name`. The columns represent the model's pose data. The data tag order is as follows: 
     1. `THETA`: joint angle
     2. `POS-X`: x-coordinate
     3. `POS-Y`: y-coordinate
     4. `POS-Z`: z-coordinate
+ 
+    A file named `{PIVOT_JOINT}_JOINTANGLE_PLOT.png` will also be generated with the plot of the joint angle data for all executed algorithms with respect to the appropriate `PIVOT_JOINT` (e.g. _RKNEE_ for joint angle with right knee as vertex or pivot of joint angle). 
+
+## Future Work
+- Comparison study between 3D pose data and Optical Tracking System (OTS) data
+- Align 3D pose data with OTS 
+- Calibrate 3D pose data with OTS
+- Compute 3D positional errors between model and OTS, and compute MPJPE and PJD metrics
