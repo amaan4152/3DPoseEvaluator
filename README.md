@@ -86,7 +86,8 @@ An example run of **step 6** with the example scenario in **step 4** without GPU
     4. `POS-Z`: z-coordinate
  
     A file named `{PIVOT_JOINT}_JOINTANGLE_PLOT.png` will also be generated with the plot of the joint angle data for all executed algorithms with respect to the appropriate `PIVOT_JOINT` (e.g. _RKNEE_ for joint angle with right knee as vertex or pivot of joint angle). 
-
+    
+    **_Note:_** this tool works for tracking the right leg at the moment.
 ## Future Work
 - Comparison study between 3D pose data and Optical Tracking System (OTS) data
 - Align 3D pose data with OTS 
