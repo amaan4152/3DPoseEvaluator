@@ -13,6 +13,7 @@ GAIT analysis OTS and IMU data are in the data folder.
  2. Clone this github repository. Make sure to be at the top of the repository directory from here on out.
  3. Make 1 directories: 
     - `output`: directory that will contain all results after successful execution
+    - 
  **_Note:_** store any videos for testing in the `videos` directory.
  
  4. The tree structure from the top and 2 levels deep should be as follows: 
