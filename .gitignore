@@ -1,6 +1,5 @@
 .python-version
 data/
-videos/
 video-lib/
 src/__pycache__/
 .vscode/
