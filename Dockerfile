@@ -66,4 +66,4 @@ RUN mkdir /root/Blazepose /root/Blazepose/output
 COPY src/models/exec_blazepose /root/Blazepose
 WORKDIR /home/
 
-# ENTRYPOINT [ "make", "all" ]
+ENTRYPOINT [ "make", "all" ]
