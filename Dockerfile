@@ -59,7 +59,7 @@ RUN source ~/.bashrc && \
     pip uninstall -y gdown importlib-metadata && \
     pip install gdown
 RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
-RUN source scripts/prepare_data.shS
+RUN source scripts/prepare_data.sh
 RUN mkdir /root/Blazepose /root/Blazepose/output 
 COPY src/models/exec_blazepose.py /root/Blazepose
 WORKDIR /home/
