@@ -2,16 +2,19 @@ PROG=src/main.py
 DATA=data/GAIT_noexo_00.csv
 
 .PHONY: 
-	all pretty clean
+	all init pretty clean
 
-all:
+all: init
 ifeq ($(EVAL),True)
-	python3 $(PROG) -v $(VIDEO) -m $(MODEL) --eval
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -m $(MODEL) --eval
 else ifeq ($(ANIMATE),True)
-	python3 $(PROG) -v $(VIDEO) -m $(MODEL) --animate
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -m $(MODEL) --animate
 else
-	python3 $(PROG) -v $(VIDEO) -m $(MODEL)
+	python3 $(PROG) -v $(VIDEO) -d $(DATA) -m $(MODEL)
 endif
+
+init: 
+	bash scripts/set_device.sh
 
 pretty:
 	@black src/*.py

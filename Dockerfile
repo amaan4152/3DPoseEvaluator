@@ -1,4 +1,4 @@
-FROM python:3.8-slim AS base
+FROM python:3.8-slim as base
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get --no-install-recommends --no-install-suggests -yq install make python3-opencv git
@@ -18,7 +18,6 @@ COPY scripts/ /root/build/scripts/
 WORKDIR /root/build/scripts
 SHELL ["/bin/bash", "-c"]
 RUN bash -x init_pyenv.sh
-
 
 # Ref: https://medium.com/@acpanjan/download-google-drive-files-using-wget-3c2c025a8b99
 FROM pyenv-config as add-gast
@@ -46,7 +45,6 @@ RUN cd checkpoint/gastnet && \
 
 
 FROM pyenv-config as add-vibe
-ENV PYENV_VIRTUALENV_DISABLE_PROMPT 1
 COPY --from=add-gast /root /root
 WORKDIR /root
 SHELL ["/bin/bash", "-c"]
@@ -61,9 +59,9 @@ RUN source ~/.bashrc && \
     pip uninstall -y gdown importlib-metadata && \
     pip install gdown
 RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
-RUN source scripts/prepare_data.sh
+RUN source scripts/prepare_data.shS
 RUN mkdir /root/Blazepose /root/Blazepose/output 
-COPY src/models/exec_blazepose /root/Blazepose
+COPY src/models/exec_blazepose.py /root/Blazepose
 WORKDIR /home/
 
 ENTRYPOINT [ "make", "all" ]
