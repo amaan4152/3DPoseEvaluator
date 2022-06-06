@@ -22,7 +22,7 @@ GAIT analysis OTS and IMU data are in the data folder.
     ├── output
     ├── scripts
     │   └── init_pyenv.sh
-    │   └── init_pyenv.sh
+    │   └── set_device.sh
     ├── src
     │   ├── models
     │   │   ├── blazepose_reader.py
