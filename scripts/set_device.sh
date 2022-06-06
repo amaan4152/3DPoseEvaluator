@@ -3,9 +3,9 @@ if ! command -v nvidia-smi &> /dev/null
 then
     echo "NOTICE: CUDA driver not detected assuming device is CPU..."
 
-    # VIBE uses torch.load to load in pretrained data. However, this causes problems
+    # VIBE and GAST-NET uses torch.load to load in pretrained data. However, this causes problems
     # for CPU based devices that execute VIBE. In order to bypass this problem we can 
     # modify  all instances of torch.load(pretrained) and add the special argument map_location='cpu'
-    sed -i "s/torch\.load(*/&\, map\_location=\'cpu\'/g" /root/VIBE/*
+    find $1 -type f -name "*.py" -exec sed -i "s/torch\.load([a-zA-Z0-9_]*/&\, map\_location=\'cpu\'/g" {} +
     exit
 fi
