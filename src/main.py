@@ -162,7 +162,7 @@ def main():
 
     # pose raw data generation
     mod_name = args.model.lower()
-    vid_name = Path(args.video).name.lower()
+    vid_name = Path(args.video).name.lower().split('.')[0]
     if not args.eval:
         df_m_raw = pose_gen(
             args.video, args.data, mod_name, args.animate, args.start, args.end, joints, None
