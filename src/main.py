@@ -123,10 +123,8 @@ def generate_plots(vid_name : str):
         df_list['JOINTS'] = attr[:, 1]
         df_list['MODELS'].append(*attr[:, 0].flatten())
 
-    print(df_list['JOINTS'])
     for j in df_list['JOINTS']:
         df_models = pd.concat([df[f"{m}:{j}:theta"] for df, m in zip(df_list['JA'], df_list['MODELS'])], axis=1)
-        print(df_models)
         plt.figure(figsize=(19, 9))
         ax = sns.lineplot(data=df_models)
         plt.legend(labels=df_list["MODELS"])

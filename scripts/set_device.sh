@@ -6,6 +6,6 @@ then
     # VIBE and GAST-NET uses torch.load to load in pretrained data. However, this causes problems
     # for CPU based devices that execute VIBE. In order to bypass this problem we can 
     # modify  all instances of torch.load(pretrained) and add the special argument map_location='cpu'
-    find $1 -type f -name "*.py" -exec sed -i "s/torch\.load(.*[^)]/&\, map\_location=\'cpu\'/g" {} +
+    find $1 -type f -name "*.py" -exec sed -rei "s/(torch\.load\(.*)(\).*)/\1\, map\_location=\'cpu\'\2/g" {} +
     exit
 fi
