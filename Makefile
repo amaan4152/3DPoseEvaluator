@@ -5,9 +5,9 @@ PROG=src/main.py
 
 all:
 ifeq ($(MODEL),VIBE)
-	bash scripts/set_device.sh "/root/VIBE"
+	@bash scripts/set_device.sh "/root/VIBE"
 else ifeq ($(MODEL),GAST)
-	bash scripts/set_device.sh "/root/GAST-Net-3DPoseEstimation"
+	@bash scripts/set_device.sh "/root/GAST-Net-3DPoseEstimation"
 endif
 ifeq ($(EVAL),True)
 	python3 $(PROG) -v $(VIDEO) -m $(MODEL) --eval
