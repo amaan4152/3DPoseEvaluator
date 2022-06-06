@@ -1,4 +1,5 @@
 .python-version
+output/
 data/
 video-lib/
 src/__pycache__/
@@ -6,3 +7,4 @@ src/models/__pycache__/
 .vscode/
 raw_data.csv
 .venv/
+test.txt
