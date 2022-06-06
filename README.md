@@ -11,7 +11,7 @@ GAIT analysis OTS and IMU data are in the data folder.
  1. Install docker into system: https://docs.docker.com/get-docker/<br>
     Check if docker CLI is available and ready: `docker --version`
  2. Clone this github repository. Make sure to be at the top of the repository directory from here on out.
- 3. Make 1 directorie: 
+ 3. Make 1 directory: 
     - `output`: directory that will contain all results after successful execution
     
  **_Note:_** store any videos for testing in the `videos` directory.
