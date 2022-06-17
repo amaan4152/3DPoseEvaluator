@@ -28,8 +28,8 @@
             "--vid_file" : "",
             "--output_folder" : "output/",
             "--no_render" : "",
-            "--tracker_batch_size" : 4,
-            "--vibe_batch_size" : 128
+            "--tracker_batch_size" : 1,
+            "--vibe_batch_size" : 64
         },
         "output_dir": "output/",
         "output_dataFormats": "pkl",
