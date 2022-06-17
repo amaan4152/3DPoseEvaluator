@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def data_parse2(model_name: str, model_data: dict, joints: dict) -> pd.DataFrame:
     """
     Parse pose estimation data into DataFrames with the following order:
@@ -32,9 +33,7 @@ def data_parse2(model_name: str, model_data: dict, joints: dict) -> pd.DataFrame
         ]
 
         # make dataframes
-        df_theta = pd.DataFrame(
-            model_data["theta"], columns=theta_column
-        )
+        df_theta = pd.DataFrame(model_data["theta"], columns=theta_column)
 
         # Note: need to make sure that the order of model_data matches column labels!
         df_joints = None

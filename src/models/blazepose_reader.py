@@ -1,4 +1,6 @@
 from numpy import load, array
+
+
 def parse_blazepose(npz_file):
     """
     Parse Blazepose pose data

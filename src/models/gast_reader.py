@@ -1,4 +1,6 @@
 from numpy import load, array
+
+
 def parse_gast(npz_file):
     """
     Parse GAST pose data

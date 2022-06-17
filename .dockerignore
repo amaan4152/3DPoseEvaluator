@@ -5,9 +5,7 @@ src/traj-dist
 src/__pycache__
 video-lib
 .venv/
-output/*
 README.md
 .gitignore
 .python-version
 .vscode/
-raw_data.csv

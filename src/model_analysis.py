@@ -59,24 +59,27 @@ FEATURES TO ADD:
 
 from models.ModelRegistry import ModelRegistry
 import json
+
 src = "./src"
-def get_poseData2(video : str, model_name : str, animate : bool):
+
+
+def get_poseData2(video: str, model_name: str, animate: bool):
     # get joint indicies of `model_name`
     MODEL_KEY = model_name.upper()
     with open(f"{src}/models/cfg_joints.json", "r") as cfg_joints_file:
         JOINT_KEYS = json.load(cfg_joints_file)
     RIGHT_LEG_JOINTS = [
-        JOINT_KEYS['RIGHT_HIP'][MODEL_KEY],
-        JOINT_KEYS['RIGHT_KNEE'][MODEL_KEY],
-        JOINT_KEYS['RIGHT_ANKLE'][MODEL_KEY],
+        JOINT_KEYS["RIGHT_HIP"][MODEL_KEY],
+        JOINT_KEYS["RIGHT_KNEE"][MODEL_KEY],
+        JOINT_KEYS["RIGHT_ANKLE"][MODEL_KEY],
     ]
 
     # execute model and parse output data file(s)
     MR = ModelRegistry()
     output_files = MR.exec_model(model_name, video, animate)
-    if animate: 
+    if animate:
         return [None] * 3
-    model_data = MR.parse_data(model_name, output_files['data'])
+    model_data = MR.parse_data(model_name, output_files["data"])
 
     # compose joint 3D position, joint angle, and joint quaternion data
     model_joint_angle = [None] * len(model_data)

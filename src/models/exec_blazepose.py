@@ -15,24 +15,25 @@ import shutil
 from tqdm import tqdm
 
 # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
-HEADER = '\033[95m'
-OKBLUE = '\033[94m'
-OKCYAN = '\033[96m'
-OKGREEN = '\033[92m'
-WARNING = '\033[93m'
-FAIL = '\033[91m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
+HEADER = "\033[95m"
+OKBLUE = "\033[94m"
+OKCYAN = "\033[96m"
+OKGREEN = "\033[92m"
+WARNING = "\033[93m"
+FAIL = "\033[91m"
+ENDC = "\033[0m"
+BOLD = "\033[1m"
+UNDERLINE = "\033[4m"
 
 
-def logging(l_type : str, mssg : str):
+def logging(l_type: str, mssg: str):
     log_type = {
-        'ERROR' : FAIL,
-        'WARNING' : WARNING,
-        'GOOD' : OKGREEN,
+        "ERROR": FAIL,
+        "WARNING": WARNING,
+        "GOOD": OKGREEN,
     }
     print(f"[{log_type[l_type]}{l_type}{ENDC}]: {mssg}")
+
 
 def cli_parse():
     pcli = ap.ArgumentParser(
@@ -73,7 +74,7 @@ def exec_blazepose(vid_path, save_out=False):
 
     # input video capture source
     print(f"Input video path: {vid_path}")
-    cap = VideoCapture(vid_path)                    
+    cap = VideoCapture(vid_path)
 
     # capture output if specified in CLI
     o_cap = None
@@ -90,7 +91,7 @@ def exec_blazepose(vid_path, save_out=False):
     pbar.set_description("Frame # Progress: ")
     frame_num = 1
 
-    bp_data = [] 
+    bp_data = []
     with mp_pose.Pose(
         min_detection_confidence=0.75, min_tracking_confidence=0.95, model_complexity=2
     ) as pose:
@@ -105,7 +106,7 @@ def exec_blazepose(vid_path, save_out=False):
             img = cvtColor(img, COLOR_BGR2RGB)
             results = pose.process(img)
             landmark_data = results.pose_landmarks.landmark
-            
+
             frame_data = []
             for joint in landmark_data:
                 frame_data.append([joint.x, joint.y, joint.y])
@@ -143,6 +144,7 @@ def main():
     _, arg = cli_parse()
     init_dir(f"/root/{model_name}", model_name)
     exec_blazepose(arg.video, arg.animate)
+
 
 if __name__ == "__main__":
     main()

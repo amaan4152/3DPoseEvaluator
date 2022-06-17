@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def edr(df_mod : pd.DataFrame, df_ots : pd.DataFrame, eps):
+def edr(df_mod: pd.DataFrame, df_ots: pd.DataFrame, eps):
     """
     Edit Distance for Real Sequences
     Ref: https://github.com/bguillouet/traj-dist
@@ -44,20 +44,20 @@ def edr(df_mod : pd.DataFrame, df_ots : pd.DataFrame, eps):
     ix = np.zeros(shape=(M + N, 1))
     iy = np.zeros(shape=(M + N, 1))
     i, j, k = M, N, 1
-    while (i>1 or j>1):
+    while i > 1 or j > 1:
         if j == 1:
             i -= 1
         elif i == 1:
             j -= 1
         else:
-            cij = C[i-1, j-1]
-            ci = C[i-1, j]
-            cj = C[i, j-1]
+            cij = C[i - 1, j - 1]
+            ci = C[i - 1, j]
+            cj = C[i, j - 1]
             i = i - int((ci <= cj) or (cij <= cj) or (cj != cj))
             j = j - int((cj < ci) or (cij <= ci) or (ci != ci))
         k += 1
-        ix[k] = i;
-        iy[k] = j;
+        ix[k] = i
+        iy[k] = j
 
     ix = ix[k::-1]
     iy = iy[k::-1]
