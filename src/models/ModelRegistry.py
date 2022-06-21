@@ -114,7 +114,7 @@ class ModelRegistry:
             shell=True,
             executable="/bin/bash",
         )  # default executable arg is /bin/sh
-        rc = self.__rt_stdout(proc)  # return code useless at the moment
+        rc = self.__rt_stdout(proc)
         if rc != 0:
             print(
                 f"[{self.__FAIL}ERROR{self.__ENDC}]: 3D pose estimation algorithm failed execution."
@@ -212,10 +212,10 @@ class ModelRegistry:
         exec_cmd = " ".join([model_cmd, model_flags])
 
         # include pre/post processing commands for model `name` if provided
-        if actions == "":
+        if actions == []:
             main_cmd = "".join([env_cmd, exec_cmd])
         else:
-            actions = f"{actions};"
+            actions = f"{';'.join(actions)};"
             main_cmd = "".join([actions, env_cmd, exec_cmd])
 
         return main_cmd

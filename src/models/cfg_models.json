@@ -5,7 +5,7 @@
         "cmd": "python3 gen_skes.py",
         "vid_flag" : "-v",
         "video_path_type": "name",
-        "animation_flag" : "--aniamtion",
+        "animation_flag" : "--animation",
         "no_animation_flag" : "",
         "flags": {
             "-v" : "",
@@ -14,7 +14,7 @@
         "output_dir": "output/",
         "output_dataFormats": "npz",
         "output_videoFormats": "mp4",
-        "actions" : "cp /home/videos/* /root/GAST-Net-3DPoseEstimation/data/video/"
+        "actions" : ["cp /home/videos/* /root/GAST-Net-3DPoseEstimation/data/video/"]
     },
     "vibe": {
         "dirname": "VIBE", 
@@ -34,7 +34,7 @@
         "output_dir": "output/",
         "output_dataFormats": "pkl",
         "output_videoFormats": "mp4",
-        "actions" : ""
+        "actions" : []
     },
     "blazepose": {
         "dirname": "Blazepose", 
@@ -50,6 +50,6 @@
         "output_dir": "output/",
         "output_dataFormats": "npz",
         "output_videoFormats": "mp4",
-        "actions" : ""
+        "actions" : []
     }
 }

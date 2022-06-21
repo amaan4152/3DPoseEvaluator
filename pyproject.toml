@@ -21,6 +21,7 @@ argparse = "^1.4.0"
 Cython = "^0.29.26"
 setuptools = "^60.5.0"
 ffmpeg = "^1.4"
+numba = "^0.55.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"

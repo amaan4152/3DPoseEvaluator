@@ -16,5 +16,5 @@ def parse_blazepose(npz_file):
     """
     # WARNING: 3D coordinate system for GAST revolves around pelvis (keypoint #0) as origin
     # 3D array: dim_03->list of frame data of vid seq; dim_02 -> indexed by # of frames; dim_01 -> indexed by keypoint #
-    BP_data = load(npz_file)["pose_data"]
+    BP_data = load(npz_file)["pose_data"] * 1000
     return BP_data

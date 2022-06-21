@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from numba import jit
 import numpy as np
 import pyquaternion as pq
 
@@ -11,7 +12,7 @@ VID_FPS = 60
 OTS_FPS = 120
 
 
-class GroundTruth:
+class GroundTruth(object):
     VID_FPS = 60
     OTS_FPS = 120
     src = "./src/models"
@@ -24,7 +25,9 @@ class GroundTruth:
         start_frame: int,
         end_frame: int,
     ):
-        print(f"[{WARNING}WARNING{ENDC}]: Extracting and compiling ground truth data...")
+        print(
+            f"[{WARNING}WARNING{ENDC}]: Extracting and compiling ground truth data..."
+        )
         # configure frame ID range for ground truth
         self.sframe = start_frame
         self.fframe = end_frame
@@ -32,9 +35,13 @@ class GroundTruth:
         self.fframe *= int(self.OTS_FPS / self.VID_FPS)
 
         # get ground truth and joints config
-        self.gnd_df = pd.read_csv(
-            file, skiprows=skp_rows, header=header_row_list, dtype="unicode"
-        ).astype(float).iloc[self.sframe:self.fframe, :]
+        self.gnd_df = (
+            pd.read_csv(
+                file, skiprows=skp_rows, header=header_row_list, dtype="unicode"
+            )
+            .astype(float)
+            .iloc[self.sframe : self.fframe, :]
+        )
         with open(f"{self.src}/cfg_joints.json", "r") as cfg_model_file:
             self.joints_dict = json.load(cfg_model_file)
         self.cols = np.array(list(map(list, self.gnd_df.columns)))
@@ -123,8 +130,8 @@ class GroundTruth:
 
         theta = 180 - np.abs(del_q.degrees)
         return theta
-    
-    def __substrColMatcher(self, joints, MICols): 
+
+    def __substrColMatcher(self, joints : list, MICols : np.ndarray) -> list:
         return list(
             set(filter(lambda s, j=joints: any(map(s.__contains__, j)), MICols.T[0]))
         )

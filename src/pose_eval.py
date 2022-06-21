@@ -1,11 +1,5 @@
 import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
-from resampy import resample
-from scipy import signal
-
-MOD_FPS = 60
-GND_FPS = 120
 
 
 def MPJPE(gnd_joints, model_joints):
@@ -14,7 +8,7 @@ def MPJPE(gnd_joints, model_joints):
         model_joints[j] = model_joints[j].to_numpy(copy=True)
         gnd_joints[j] = gnd_joints[j].to_numpy(copy=True)
         diff = model_joints[j] - gnd_joints[j]
-        exp = diff**2
+        exp = diff ** 2
         d = np.sqrt(exp.sum(axis=1))
         tot = d.size
         mpjpe_dat.at[j] = d.sum(axis=0) / tot
@@ -28,7 +22,7 @@ def PDJ(gnd_joints, model_joints, torso_diam):
         model_joints[j] = model_joints[j].to_numpy(copy=True)
         gnd_joints[j] = gnd_joints[j].to_numpy(copy=True)
         diff = model_joints[j] - gnd_joints[j]
-        exp = diff**2
+        exp = diff ** 2
         d = np.sqrt(exp.sum(axis=1))
         tot = d.size
         if (d.sum() / tot) < (0.2 * torso_diam):
@@ -56,7 +50,7 @@ def arun(MODEL, GND):
     return R, t
 
 
-def calibrate(R, t, df_model: DataFrame):
+def calibrate(R, t, df_model: pd.DataFrame):
     """
     diff = MODEL.shape[0] - GND.shape[0]
     if diff > 0:

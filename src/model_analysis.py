@@ -87,27 +87,22 @@ def get_poseData2(video: str, model_name: str, animate: bool):
     HIP_pos = [None] * len(model_data)
     KNEE_pos = [None] * len(model_data)
     ANKL_pos = [None] * len(model_data)
-    for frame_num in range(0, len(model_data)):
-        rhip = model_data[frame_num][RIGHT_LEG_JOINTS[0]]
-        rknee = model_data[frame_num][RIGHT_LEG_JOINTS[1]]
-        rankle = model_data[frame_num][RIGHT_LEG_JOINTS[2]]
+    for i, data in enumerate(model_data):
+        rhip = data[RIGHT_LEG_JOINTS[0]]
+        rknee = data[RIGHT_LEG_JOINTS[1]]
+        rankle = data[RIGHT_LEG_JOINTS[2]]
 
         rfemur = rknee - rhip
         rtibia = rankle - rknee
         estim_theta = 180 - joint_angle(rfemur, rtibia)
         estim_axis = np.cross(rfemur, rtibia)
         estim_quat = pq.Quaternion(axis=estim_axis, angle=estim_theta)
-        model_joint_angle[frame_num] = estim_theta
-        model_quat[frame_num] = (
-            estim_quat.elements[0],
-            estim_quat.elements[1],
-            estim_quat.elements[2],
-            estim_quat.elements[3],
-        )
+        model_joint_angle[i] = estim_theta
+        model_quat[i] = estim_quat.elements
 
-        HIP_pos[frame_num] = rhip
-        KNEE_pos[frame_num] = rknee
-        ANKL_pos[frame_num] = rankle
+        HIP_pos[i] = rhip
+        KNEE_pos[i] = rknee
+        ANKL_pos[i] = rankle
 
     model_pos = [HIP_pos, KNEE_pos, ANKL_pos]
     return model_pos, model_joint_angle, model_quat

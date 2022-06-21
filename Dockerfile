@@ -9,13 +9,13 @@ RUN curl https://pyenv.run | bash
 RUN pip3 install poetry
 
 FROM base as pyenv-config
-COPY poetry.lock pyproject.toml ./
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
-ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
 COPY --from=base /root/.pyenv/ /root/.pyenv/
-COPY scripts/ /root/build/scripts/
-WORKDIR /root/build/scripts
+COPY poetry.lock pyproject.toml ./
+COPY scripts/ /root/scripts
+WORKDIR /root/scripts
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev && pip cache purge
+ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
 SHELL ["/bin/bash", "-c"]
 RUN bash -x init_pyenv.sh
 
@@ -30,8 +30,8 @@ COPY videos data/video/
 COPY src/gast-requirements.txt /root/
 RUN source ~/.bashrc pyenv && \
     pyenv local gast-env && \
-    python3 -m pip install -U pip && \
-    pip install -r ../gast-requirements.txt
+    python3 -m pip --no-cache-dir install -U pip && \
+    pip --no-cache-dir install -r ../gast-requirements.txt 
 RUN mkdir checkpoint && cd checkpoint && \
     mkdir yolov3 hrnet gastnet
 RUN cd checkpoint/yolov3 && wget https://pjreddie.com/media/files/yolov3.weights
@@ -45,19 +45,21 @@ RUN cd checkpoint/gastnet && \
 
 
 FROM pyenv-config as add-vibe
-COPY --from=add-gast /root /root
+COPY --from=add-gast /root/.bashrc /root/.bashrc
+COPY --from=add-gast /root/.pyenv /root/.pyenv
+COPY --from=add-gast /root/GAST-Net-3DPoseEstimation /root/GAST-Net-3DPoseEstimation
 WORKDIR /root
 SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/mkocabas/VIBE.git /root/VIBE
 WORKDIR /root/VIBE
 RUN pyenv local vibe-env
 RUN source ~/.bashrc && \
-    pip install -U pip && \
-    pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0 && \
-    pip install git+https://github.com/giacaglia/pytube.git --upgrade && \
-    pip install -r requirements.txt && \
-    pip uninstall -y gdown importlib-metadata && \
-    pip install gdown
+    pip --no-cache-dir install -U pip && \
+    pip --no-cache-dir install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0 && \
+    pip --no-cache-dir install git+https://github.com/giacaglia/pytube.git --upgrade && \
+    pip --no-cache-dir install -r requirements.txt && \
+    pip --no-cache-dir uninstall -y gdown importlib-metadata && \
+    pip --no-cache-dir install gdown
 RUN apt-get install unzip llvm freeglut3 freeglut3-dev -y
 RUN source scripts/prepare_data.sh
 RUN mkdir /root/Blazepose /root/Blazepose/output 
