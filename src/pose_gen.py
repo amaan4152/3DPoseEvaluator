@@ -2,7 +2,7 @@ from model_analysis import get_poseData2
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from truth_analysis import GroundTruth
+from GroundTruth import GroundTruth
 
 OKGREEN = "\033[92m"
 ENDC = "\033[0m"
@@ -46,7 +46,7 @@ def pose_gen(
 
 def data_parse(model_name: str, model_data: dict, joints: dict) -> pd.DataFrame:
     """
-    Note: 
+    Note:
     Parse pose estimation data into DataFrames with the following order:
         `[POSITION (XYZ), THETA (joint angle), QUATERNION (orientation), ... ]`
 
@@ -79,8 +79,7 @@ def data_parse(model_name: str, model_data: dict, joints: dict) -> pd.DataFrame:
         theta_data = np.array(model_data["theta"]).squeeze().reshape(-1, 1)
         pos_data = np.hstack(model_data["pos"])
         data = np.hstack([theta_data, pos_data])
-        
-        df = pd.concat([df, pd.DataFrame(data, columns=cols)], axis=1)
-        
-    return df
 
+        df = pd.concat([df, pd.DataFrame(data, columns=cols)], axis=1)
+
+    return df
