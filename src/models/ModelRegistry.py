@@ -3,23 +3,21 @@ import json
 from pathlib import Path
 from shutil import copyfile
 import subprocess as sp
+from utils.diagnostic_tools import timeit
 
 
 class ModelRegistry:
     src = "./src/models"
 
     # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
-    __HEADER = "\033[95m"
-    __OKBLUE = "\033[94m"
-    __OKCYAN = "\033[96m"
-    __OKGREEN = "\033[92m"
-    __WARNING = "\033[93m"
-    __FAIL = "\033[91m"
-    __ENDC = "\033[0m"
-    __BOLD = "\033[1m"
-    __UNDERLINE = "\033[4m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
 
-    def __init__(self):
+    def __init__(self, diagnostics=False):
+        self._diagnostics = True
         with open(f"{self.src}/cfg_models.json", "r") as cfg_model_file:
             self.models = json.load(cfg_model_file)
 
@@ -70,6 +68,7 @@ class ModelRegistry:
         # reload model configurations
         self.__init__()
 
+    @timeit
     def exec_model(self, name: str, video: str, animate: bool):
         """
         Execute model `name` on `video`.
@@ -83,7 +82,7 @@ class ModelRegistry:
         `name`:  model name
         `video`: input video file
         """
-        print(f"\n\t\t\t\t  ===== {self.__OKCYAN}{name.upper()}{self.__ENDC} =====\n")
+        print(f"\n\t\t\t\t  ===== {self.OKCYAN}{name.upper()}{self.ENDC} =====\n")
         path_type = self.models[name]["video_path_type"]
         vid_name = Path(video).name
         if path_type == "absolute":
@@ -117,24 +116,15 @@ class ModelRegistry:
         rc = self.__rt_stdout(proc)
         if rc != 0:
             print(
-                f"[{self.__FAIL}ERROR{self.__ENDC}]: 3D pose estimation algorithm failed execution."
+                f"[{self.FAIL}ERROR{self.ENDC}]: 3D pose estimation algorithm failed execution."
             )
             exit(1)
-
-        out_files = self.__get_output_files(name, vid_name.split(".")[0])
-        if out_files["data"] == []:
-            print(
-                f"[{self.__FAIL}ERROR{self.__ENDC}]: No data output file(s) detected from algorithm, exiting..."
-            )
-            exit(1)
-
-        return out_files
 
     def parse_data(self, name: str, *args):
         filename = f"{name}_reader"
         if not Path(f"{self.src}/{filename}.py").exists():
             print(
-                f"[{self.__FAIL}ERROR{self.__ENDC}]: Either model parser file doesn't exist or incorrect name provided."
+                f"[{self.FAIL}ERROR{self.ENDC}]: Either model parser file doesn't exist or incorrect name provided."
             )
             exit(1)
 
@@ -144,8 +134,7 @@ class ModelRegistry:
 
         return model_data
 
-    # get vid/data by most recently generated? (ls -t sort?)
-    def __get_output_files(self, name: str, video_name: str):
+    def get_output_files(self, name: str, video_name: str):
         out_dir = (
             f"/root/{self.models[name]['dirname']}/{self.models[name]['output_dir']}"
         )
@@ -164,12 +153,12 @@ class ModelRegistry:
                 if out_files == []:
                     if dType_list == []:
                         print(
-                            f"[{self.__OKGREEN}WARNING{self.__ENDC}]: Seems like 3D pose estimation algorithm generated no data. Terminating program without error."
+                            f"[{self.OKGREEN}WARNING{self.ENDC}]: Seems like 3D pose estimation algorithm generated no data. Terminating program without error."
                         )
                         exit(0)
 
                     print(
-                        f"[{self.__WARNING}WARNING{self.__ENDC}]: No .{ext} output file detected"
+                        f"[{self.WARNING}WARNING{self.ENDC}]: No .{ext} output file detected"
                     )
                     break
 

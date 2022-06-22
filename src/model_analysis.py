@@ -59,6 +59,7 @@ FEATURES TO ADD:
 
 from models.ModelRegistry import ModelRegistry
 import json
+from pathlib import Path
 
 src = "./src"
 
@@ -75,8 +76,16 @@ def get_poseData2(video: str, model_name: str, animate: bool):
     ]
 
     # execute model and parse output data file(s)
+    vid_name = Path(video).name
     MR = ModelRegistry()
-    output_files = MR.exec_model(model_name, video, animate)
+    MR.exec_model(model_name, video, animate)
+    output_files = MR.get_output_files(model_name, vid_name.split(".")[0])
+    if not animate and output_files["data"] == []:
+        print(
+            f"[{MR.FAIL}ERROR{MR.ENDC}]: No data output file(s) detected from algorithm, exiting..."
+        )
+        exit(1)
+
     if animate:
         return [None] * 3
     model_data = MR.parse_data(model_name, output_files["data"])

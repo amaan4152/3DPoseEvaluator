@@ -108,13 +108,6 @@ import seaborn as sns
 
 sns.set()
 
-"""
-TO-DO:
-    - perform calibration using arun method 
-    - MPJPE and PDJ error metric calcs
-"""
-
-
 def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
     df_list = {"THETA": []}
     data_files = [f for f in os.listdir("output/") if "raw_data" in f and vid_name in f]
@@ -136,9 +129,10 @@ def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
             df_gnd.columns = ["ground-truth"]
             df_models = pd.concat([df_gnd, df_models], axis=1)
 
-        plt.figure(figsize=(27, 11))
+        joint_name = " ".join([s.capitalize() for s in j.split("_")])
+        plt.figure(figsize=(15, 5))
         ax = sns.lineplot(data=df_models)
-        plt.title(f"{j} Joint Models Plot")
+        plt.title(f"{joint_name} Joint Angle Plot")
         plt.xlabel("Frame ID")
         plt.ylabel(r"$\theta(^{\circ})$")
         plt.xlim(left=-10)
@@ -147,7 +141,7 @@ def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
         plt.close()
 
 
-from pose_gen import data_parse
+from pose_gen import data_parse, pose_gen
 from Evaluator import Evaluator
 from pathlib import Path
 
@@ -169,11 +163,11 @@ def main():
     mod_name = args.model.lower()
     vid_name = Path(args.video).name.lower().split(".")[0]
     if not args.eval:
-        """df_m_raw = pose_gen(
+        df_m_raw = pose_gen(
             args.video, args.data, mod_name, args.animate, args.start, args.end, joints
-        )"""
+        )
         if not args.animate:
-            # df_m_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
+            df_m_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
             ETool = Evaluator(mod_name, vid_name)
             generate_plots(ETool.df_theta_gnd, vid_name, joints)
         else:

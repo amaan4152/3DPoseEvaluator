@@ -26,12 +26,12 @@ COPY --from=pyenv-config /root/.pyenv /root/.pyenv
 SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/fabro66/GAST-Net-3DPoseEstimation.git /root/GAST-Net-3DPoseEstimation
 WORKDIR /root/GAST-Net-3DPoseEstimation
-COPY videos data/video/
-COPY src/gast-requirements.txt /root/
+COPY src/models/gast-requirements.txt ./
 RUN source ~/.bashrc pyenv && \
     pyenv local gast-env && \
     python3 -m pip --no-cache-dir install -U pip && \
-    pip --no-cache-dir install -r ../gast-requirements.txt 
+    pip --no-cache-dir install -r gast-requirements.txt && \
+    rm -f data/video/* && rm -f output/*
 RUN mkdir checkpoint && cd checkpoint && \
     mkdir yolov3 hrnet gastnet
 RUN cd checkpoint/yolov3 && wget https://pjreddie.com/media/files/yolov3.weights
