@@ -185,17 +185,23 @@ def main():
             start_frame=args.start,
             end_frame=args.end,
         )
+        print(
+            f"[{OKGREEN}GOOD{ENDC}]: Successfully extracted and compiled ground truth data"
+        )
 
-        # calibrate
+        # calibrate/get calibration
         ETool = Evaluator(mod_name, vid_name)
-        [MCAL_pos, mod_theta] = ETool.calibrate(N=1)
-
-        # save calibration data
-        CAL_data = {"theta": mod_theta, "pos": MCAL_pos, "quat": []}
-        df_cal = data_parse(f"{mod_name}:<CAL>", CAL_data, joints)
-        df_cal.to_csv(f"output/{mod_name}-{vid_name}-cal_data.csv")
+        cal_file = f"{mod_name}-{vid_name}-cal_data.csv"
+        if Path(f"output/{cal_file}").is_file():
+            df_cal = pd.read_csv(f"output/{cal_file}", header=[0,1,2,3], index_col=0)
+        else:
+            [MCAL_pos, mod_theta] = ETool.calibrate(N=1)
+            CAL_data = {"theta": mod_theta, "pos": MCAL_pos, "quat": []}
+            df_cal = data_parse(f"{mod_name}:<CAL>", CAL_data, joints)
+            df_cal.to_csv(f"output/{cal_file}")
 
         # MPJPE
+        print(df_cal)
         mean_dists = ETool.MPJPE(df_cal.iloc[:, 1:])
         df_dists = pd.DataFrame({"MPJPE": mean_dists}, index=joint_list)
 
