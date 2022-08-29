@@ -1,0 +1,20 @@
+version: '0.1'
+services:
+  gast-net:
+    build:
+      dockerfile: Dockerfile
+      context: ./src/models/gast-net
+    volumes:
+      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
+  vibe:
+    build:
+      dockerfile: Dockerfile
+      context: ./src/models/vibe
+    volumes:
+      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
+  blazepose:
+    build:
+      dockerfile: Dockerfile
+      context: ./src/models/blazepose
+    volumes:
+      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
