@@ -1,5 +1,6 @@
 import argparse as ap
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import subprocess
 from GroundTruth import GroundTruth
@@ -108,15 +109,15 @@ import seaborn as sns
 
 sns.set()
 
+
 def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
     df_list = {"THETA": []}
-    data_files = [f for f in os.listdir("output/") if "raw_data" in f and vid_name in f]
-    for file in data_files:
-        df_raw = pd.read_csv(f"output/{file}", header=[0, 1, 2, 3])
-        mod_name = df_raw.columns[1][0]
-        if mod_name == "GND_TRUTH":
-            continue
-
+    mod_groupings = np.array(list(os.walk("output"))[1:], dtype=object)
+    models = mod_groupings[:, 0]    # subdirectory names in output dir
+    data_files = mod_groupings[:, 1:].flatten().tolist()
+    data_files = [f for m in data_files for f in m if f and "raw_data" in f and vid_name in f and "gnd" not in f]
+    for mod_name, file in zip(models, data_files):
+        df_raw = pd.read_csv(f"output/{mod_name}/{file}", header=[0, 1, 2, 3])
         df_theta = [df_raw[mod_name][j]["Joint Angle"] for j in joints.keys()]
         for df in df_theta:
             df.columns = [mod_name]
@@ -141,33 +142,44 @@ def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
         plt.close()
 
 
+def init_dirs(model : str):
+    mod_name = model.lower()
+    mod_dir = f"output/{mod_name}"
+    gnd_dir = "output/gnd_truth"
+    if not os.path.exists(mod_dir):
+        os.mkdir(mod_dir)
+    if not os.path.exists(gnd_dir):
+        os.mkdir(gnd_dir)
+
+
 from pose_gen import data_parse, pose_gen
 from Evaluator import Evaluator
 from pathlib import Path
 
 
-def main():
-    # parse CLI arguments
-    pcli, args = cli_parse()
-    if None in (args.model, args.video):
-        print("ERROR: must provide arguments for '-m' and '-v'\n")
-        pcli.print_help()
-        exit(1)
-
+def main(
+    model : str,
+    video : str,
+    data : str,
+    start_frame : int,
+    end_frame : int,
+    animate : bool,
+    eval : bool,
+):
     joints = {"RIGHT_KNEE": ["RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"]}
     joint_list = list(*joints.values())
-    # duration = get_duration(args.video)
+    # duration = get_duration(video)
     # print(f"Duration: {duration}")
 
     # pose raw data generation
-    mod_name = args.model.lower()
-    vid_name = Path(args.video).name.lower().split(".")[0]
-    if not args.eval:
+    mod_name = model.lower()
+    vid_name = Path(video).name.lower().split(".")[0]
+    if not eval:
         df_m_raw = pose_gen(
-            args.video, args.data, mod_name, args.animate, args.start, args.end, joints
+            video, data, mod_name, animate, start_frame, end_frame, joints
         )
-        if not args.animate:
-            df_m_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
+        if not animate:
+            df_m_raw.to_csv(f"output/{mod_name}/{mod_name}-{vid_name}-raw_data.csv")
             ETool = Evaluator(mod_name, vid_name)
             generate_plots(ETool.df_theta_gnd, vid_name, joints)
         else:
@@ -179,26 +191,42 @@ def main():
     # pose evaluation
     else:
         GT = GroundTruth(
-            args.data,
+            data,
             skp_rows=3,
             header_row_list=[0, 2, 3],
-            start_frame=args.start,
-            end_frame=args.end,
+            start_frame=start_frame,
+            end_frame=end_frame,
         )
         print(
             f"[{OKGREEN}GOOD{ENDC}]: Successfully extracted and compiled ground truth data"
         )
 
         # calibrate/get calibration
+        N = 1000
         ETool = Evaluator(mod_name, vid_name)
         cal_file = f"{mod_name}-{vid_name}-cal_data.csv"
-        if Path(f"output/{cal_file}").is_file():
-            df_cal = pd.read_csv(f"output/{cal_file}", header=[0,1,2,3], index_col=0)
+        cal_sim_data, cal_sim_stats = ETool.calibration_metric(
+            window_size=1, num_experiments=N, sample_size=N
+        )
+        print(cal_sim_data)
+        print(cal_sim_stats)
+
+        sns.histplot(x=cal_sim_data.iloc[:, 0].values, stat='density')
+        plt.title(f"Calibration Experiment Distribution N = {N}")
+        plt.xlabel("X (mm)")
+        plt.tight_layout()
+        plt.savefig(f"output/cal_distr.png")
+        plt.close()
+        exit(0)
+
+        if Path(f"output/{mod_name}/{cal_file}").is_file():
+            df_cal = pd.read_csv(f"output/{mod_name}/{cal_file}", header=[0, 1, 2, 3], index_col=0)
         else:
             [MCAL_pos, mod_theta] = ETool.calibrate(N=1)
+
             CAL_data = {"theta": mod_theta, "pos": MCAL_pos, "quat": []}
             df_cal = data_parse(f"{mod_name}:<CAL>", CAL_data, joints)
-            df_cal.to_csv(f"output/{cal_file}")
+            df_cal.to_csv(f"output/{mod_name}/{cal_file}")
 
         # MPJPE
         print(df_cal)
@@ -206,7 +234,7 @@ def main():
         df_dists = pd.DataFrame({"MPJPE": mean_dists}, index=joint_list)
 
         # display MPJPE
-        metrics_fname = f"output/{mod_name}-{vid_name}-eval_metrics.csv"
+        metrics_fname = f"output/{mod_name}/{mod_name}-{vid_name}-eval_metrics.csv"
         mpjpe_stats = df_dists.describe()
         mpjpe_stats.columns = ["Statistics"]
         print(df_dists)
@@ -232,4 +260,20 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # parse CLI arguments
+    pcli, args = cli_parse()
+    if None in (args.model, args.video):
+        print("ERROR: must provide arguments for '-m' and '-v'\n")
+        pcli.print_help()
+        exit(1)
+
+    init_dirs(args.model)
+    main(
+        model=args.model,
+        video=args.video,
+        data=args.data,
+        start_frame=args.start,
+        end_frame=args.end,
+        animate=args.animate,
+        eval=args.eval
+    )

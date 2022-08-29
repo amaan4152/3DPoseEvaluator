@@ -1,10 +1,10 @@
-from typing import Tuple
 import numpy as np
 import pandas as pd
-import scipy
+from tqdm import trange
+from typing import Tuple
 
 
-class Evaluator:
+class Evaluator(object):
     MOD_FPS = 60
     GND_FPS = 120
     FAIL = "\033[91m"
@@ -13,12 +13,12 @@ class Evaluator:
     def __init__(self, model: str, video: str):
         self.model_name = model
         df_model = pd.read_csv(
-            f"output/{model}-{video}-raw_data.csv", header=[0, 1, 2, 3]
+            f"output/{model}/{model}-{video}-raw_data.csv", header=[0, 1, 2, 3]
         )
         self.df_theta_model = df_model.iloc[:, 1]
         self.df_pos_model = df_model.iloc[:, 2:]
         self.df_gnd = pd.read_csv(
-            f"output/gnd-{video}-raw_data.csv", header=[0, 1, 2, 3]
+            f"output/gnd_truth/gnd-{video}-raw_data.csv", header=[0, 1, 2, 3]
         ).iloc[:, 1:]
         self.__gnd_align()
         self.df_theta_gnd = self.df_gnd.iloc[:, 0].to_frame()
@@ -49,16 +49,35 @@ class Evaluator:
         m_pos_t = np.zeros(shape=self.df_pos_model.shape)
         m_pos_data = self.df_pos_model.values
         g_pos_data = self.df_pos_gnd.values
-        for i in np.arange(start=0, stop=num_frames, step=N):
-            m_pos_samples = np.vstack(hsplit(m_pos_data[i : (N + i), :]))
-            g_pos_samples = np.vstack(hsplit(g_pos_data[i : (N + i), :]))
-            self.__arun(m_pos_samples.T, g_pos_samples.T)
+
+        # compute R,t
+        m_pos_samples = np.vstack(hsplit(m_pos_data[0:N, :]))
+        g_pos_samples = np.vstack(hsplit(g_pos_data[0:N, :]))
+        self.__arun(m_pos_samples.T, g_pos_samples.T)
+        for i in np.arange(start=N, stop=num_frames, step=N):
             m_pos_t[i : (N + i), :] = np.hstack(
                 vsplit(transform(m_pos_samples.T))
             )  # shape = (N, d*n)
+            m_pos_samples = np.vstack(hsplit(m_pos_data[i : (N + i), :]))
 
         MCAL_pos = hsplit(m_pos_t)
         return MCAL_pos, self.df_theta_model.values
+
+    def calibration_metric(
+        self, window_size: int, num_experiments: int, sample_size: int
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        out_list = [None] * num_experiments
+        for i in trange(num_experiments):
+            cal_pos_data = self.calibrate(N=window_size)[0]
+            num_rows = cal_pos_data.shape[1]
+            if i == 0:
+                inds = np.random.choice(num_rows, sample_size)
+            pos_set = np.hstack([data[inds, :] for data in cal_pos_data])
+            out_list[i] = pos_set
+
+        out_data = pd.DataFrame(np.vstack(out_list))
+        out_data.columns = self.df_pos_model.columns
+        return out_data, out_data.describe()
 
     def MPJPE(self, df_pos_cal: pd.DataFrame):
         # retrieve joint sets
