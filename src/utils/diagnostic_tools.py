@@ -1,8 +1,5 @@
 from functools import wraps
-import numpy as np
-import pandas as pd
 import time
-
 
 def timeit(func):
     @wraps(func)
@@ -10,9 +7,9 @@ def timeit(func):
         _t_start = time.time()
         out = func(*args, **kwargs)
         _t_end = time.time()
-
+        
         _duration = _t_end - _t_start
-        print(f"[DIAGNOSTICS]: ({func.__name__}) Elapsed time -> {_duration}")
+        print(f"[DIAGNOSTICS]: Elapsed time -> {_duration}")
         return out
 
     return wrapper

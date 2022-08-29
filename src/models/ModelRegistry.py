@@ -177,7 +177,7 @@ class ModelRegistry:
                 v_name = vid.name
                 copyfile(
                     vid,
-                    f"/home/output/{name}/{name}-{video_name.lower()}-output.{v_name.split('.')[-1]}",
+                    f"/home/output/{name}-{video_name.lower()}-output.{v_name.split('.')[-1]}",
                 )
 
         return outputs
