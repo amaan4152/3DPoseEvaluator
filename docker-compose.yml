@@ -1,20 +1,34 @@
-version: '0.1'
+version: "3.7"
 services:
+  tool-base:
+    build:
+      dockerfile: Dockerfile
+      context: ./src
+    volumes:
+      - test-vol:/home
   gast-net:
     build:
       dockerfile: Dockerfile
-      context: ./src/models/gast-net
+      context: ./models/gast-net
     volumes:
-      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
+      - test-vol:/home
   vibe:
     build:
       dockerfile: Dockerfile
-      context: ./src/models/vibe
+      context: ./models/vibe
     volumes:
-      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
+      - test-vol:/home
   blazepose:
     build:
       dockerfile: Dockerfile
-      context: ./src/models/blazepose
+      context: ./models/blazepose
     volumes:
-      - /zooper2/amaan.rahman/3DPoseEvaluator:/home
+      - test-vol:/home
+
+volumes:
+  test-vol: 
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/Documents/NIST/3DPoseEvaluator
+      o: bind

@@ -61,7 +61,7 @@ from models.ModelRegistry import ModelRegistry
 import json
 from pathlib import Path
 
-src = "./src"
+src = "."
 
 
 def get_poseData2(video: str, model_name: str, animate: bool):

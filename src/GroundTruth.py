@@ -15,7 +15,7 @@ OTS_FPS = 120
 class GroundTruth(object):
     VID_FPS = 60
     OTS_FPS = 120
-    src = "./src/models"
+    src = "./models"
 
     def __init__(
         self,
