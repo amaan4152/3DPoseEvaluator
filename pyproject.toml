@@ -19,7 +19,7 @@ joblib = "^1.1.0"
 mediapipe = "^0.8.9"
 argparse = "^1.4.0"
 Cython = "^0.29.26"
-setuptools = "^60.5.0"
+setuptools = "*"
 ffmpeg = "^1.4"
 numba = "^0.55.2"
 

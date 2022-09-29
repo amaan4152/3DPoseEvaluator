@@ -1,3 +1,4 @@
+from typing import List
 import joblib as jb
 import json
 import cv2
@@ -9,6 +10,7 @@ from cv2 import (
     VideoWriter,
     VideoWriter_fourcc,
 )
+from matplotlib import test
 import numpy as np
 import math
 import mediapipe as mp
@@ -64,15 +66,15 @@ from pathlib import Path
 src = "./src"
 
 
-def get_poseData2(video: str, model_name: str, animate: bool):
+def get_poseData2(video: str, model_name: str, animate: bool, joint_names : List):
     # get joint indicies of `model_name`
     MODEL_KEY = model_name.upper()
     with open(f"{src}/models/cfg_joints.json", "r") as cfg_joints_file:
         JOINT_KEYS = json.load(cfg_joints_file)
-    RIGHT_LEG_JOINTS = [
-        JOINT_KEYS["RIGHT_HIP"][MODEL_KEY],
-        JOINT_KEYS["RIGHT_KNEE"][MODEL_KEY],
-        JOINT_KEYS["RIGHT_ANKLE"][MODEL_KEY],
+    JOINTS = [
+        JOINT_KEYS[joint_names[0]][MODEL_KEY],
+        JOINT_KEYS[joint_names[1]][MODEL_KEY],
+        JOINT_KEYS[joint_names[2]][MODEL_KEY],
     ]
 
     # execute model and parse output data file(s)
@@ -97,9 +99,9 @@ def get_poseData2(video: str, model_name: str, animate: bool):
     KNEE_pos = [None] * len(model_data)
     ANKL_pos = [None] * len(model_data)
     for i, data in enumerate(model_data):
-        rhip = data[RIGHT_LEG_JOINTS[0]]
-        rknee = data[RIGHT_LEG_JOINTS[1]]
-        rankle = data[RIGHT_LEG_JOINTS[2]]
+        rhip = data[JOINTS[0]]
+        rknee = data[JOINTS[1]]
+        rankle = data[JOINTS[2]]
 
         rfemur = rknee - rhip
         rtibia = rankle - rknee

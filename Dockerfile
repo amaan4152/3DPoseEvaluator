@@ -14,7 +14,7 @@ COPY poetry.lock pyproject.toml ./
 COPY scripts/ /root/scripts
 WORKDIR /root/scripts
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev && pip cache purge
+RUN poetry install --only main && pip cache purge
 ENV PATH /root/.pyenv/shims:/root/.pyenv/bin:$PATH
 SHELL ["/bin/bash", "-c"]
 RUN bash -x init_pyenv.sh
