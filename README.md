@@ -2,6 +2,13 @@
 
 [![Generic badge](https://img.shields.io/badge/status-in--progress-yellow.svg)](https://shields.io/)
 
+## To-Do
+- [] Create modular docker pipeline schematic via localized docker networks
+- [] Create configuration files with YAML and JSON
+- [] Standardize model installation and deployment system
+- [] Execute multiple analysis experiements for kinematic studies
+- [] Incorporate more recent state-of-art monocular 3D pose estimation algorithms
+
 ## Description
 Generate 3D pose data from an arbitrary video sequence utilizing GAST-NET, VIBE, and Blazepose
 as the 3D monocular pose estimation algorithms. Evaluate the 3D pose data against the ground-truth
