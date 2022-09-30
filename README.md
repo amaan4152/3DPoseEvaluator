@@ -1,6 +1,6 @@
 # 3D Pose Estimation Evaluator
 
-[![Generic badge](https://img.shields.io/badge/<status>-<in-progress>-<yellow>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/status-in--progress-yellow.svg)](https://shields.io/)
 
 ## Description
 Generate 3D pose data from an arbitrary video sequence utilizing GAST-NET, VIBE, and Blazepose
