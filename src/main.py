@@ -140,7 +140,6 @@ def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
         plt.savefig(f"output/{j.upper()}_JOINTANGLE_PLOT.png")
         plt.close()
 
-
 from pose_gen import data_parse, pose_gen
 from Evaluator import Evaluator
 from pathlib import Path
@@ -155,6 +154,7 @@ def main():
         exit(1)
 
     joints = {"RIGHT_KNEE": ["RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"]}
+    # joints = {"LEFT_KNEE": ["LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"]}
     joint_list = list(*joints.values())
     # duration = get_duration(args.video)
     # print(f"Duration: {duration}")

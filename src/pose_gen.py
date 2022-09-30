@@ -35,7 +35,7 @@ def pose_gen(
         f"[{OKGREEN}GOOD{ENDC}]: Successfully extracted and compiled ground truth data"
     )
 
-    MODEL_pos, MODEL_theta, _ = get_poseData2(video, model_type, animation, joints.values)
+    MODEL_pos, MODEL_theta, _ = get_poseData2(video, model_type, animation, *list(joints.values()))
     model_data = {"theta": MODEL_theta, "pos": MODEL_pos}
     if animation:
         return None

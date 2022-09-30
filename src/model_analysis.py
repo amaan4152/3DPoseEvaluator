@@ -71,6 +71,7 @@ def get_poseData2(video: str, model_name: str, animate: bool, joint_names : List
     MODEL_KEY = model_name.upper()
     with open(f"{src}/models/cfg_joints.json", "r") as cfg_joints_file:
         JOINT_KEYS = json.load(cfg_joints_file)
+    print(joint_names)
     JOINTS = [
         JOINT_KEYS[joint_names[0]][MODEL_KEY],
         JOINT_KEYS[joint_names[1]][MODEL_KEY],
