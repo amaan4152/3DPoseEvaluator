@@ -12,6 +12,7 @@ raw_data.csv
 # input video dirs
 video-lib/
 videos/
+video-files/
 
 # pycache
 src/__pycache__/
