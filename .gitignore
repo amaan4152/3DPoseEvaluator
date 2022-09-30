@@ -1,11 +1,26 @@
+# python virtual envs
 .python-version
+.venv/
+
+
+# output dir
 output/
+
+# dataset dir
 data/
+raw_data.csv
+
+# input video dirs
 video-lib/
+videos/
+
+# pycache
 src/__pycache__/
 src/models/__pycache__/
+
+# vscode
 .vscode/
-raw_data.csv
-.venv/
+
+# miscellaneous
 test.txt
 utils/
