@@ -1,5 +1,7 @@
 # 3D Pose Estimation Evaluator
 
+[![Generic badge](https://img.shields.io/badge/<status>-<in-progress>-<COLOR>.svg)](https://shields.io/)
+
 ## Description
 Generate 3D pose data from an arbitrary video sequence utilizing GAST-NET, VIBE, and Blazepose
 as the 3D monocular pose estimation algorithms. Evaluate the 3D pose data against the ground-truth
