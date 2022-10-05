@@ -1,4 +1,6 @@
 version: "3.7"
+
+# adjust shared memory as needed
 services:
   tool-base:
     build:
@@ -10,29 +12,29 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./models/gast-net
-      shm_mem: '5gb'
+      shm_size: '5gb'
     volumes:
       - shared-vol:/home
   vibe:
     build:
       dockerfile: Dockerfile
       context: ./models/vibe
-      shm_mem: '5gb'
+      shm_size: '5gb'
     volumes:
       - shared-vol:/home
   blazepose:
     build:
       dockerfile: Dockerfile
       context: ./models/blazepose
-      shm_mem: '5gb'
+      shm_size: '5gb'
     volumes:
       - shared-vol:/home
 
 volumes:
   shared-vol:
-  host-vol: 
+  host-vol:
     driver: local
     driver_opts:
       type: none
-      device: ~/Documents/NIST/3DPoseEvaluator
+      device: ~/Documents/NIST/3DPoseEvaluator # set project directory absolute path here
       o: bind
