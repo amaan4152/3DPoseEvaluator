@@ -1,11 +1,17 @@
-.git
-src/GAST-Net-3DPoseEstimation
-src/VIBE
-src/traj-dist
+# env config dirs
+.venv
+.vscode
+
+# model dir
+models
+scripts
+
+# miscellaneous
 src/__pycache__
+utils
 video-lib
-.venv/
+docker-compose
+Makefile
+poetry.lock
+pyproject.toml
 README.md
-.gitignore
-.python-version
-.vscode/

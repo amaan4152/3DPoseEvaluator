@@ -1,0 +1,27 @@
+dir: gast-net
+name: GAST-Net-3DPoseEstimation
+output-dir: output
+python-version: 3.8
+cmd: python3 gen_skes.py
+device: CPU
+
+# model flags
+flags: 
+  - "-v"
+  - "-np" : 1
+
+# video pose overlay flags
+animate-opt: 
+  enable: "--animation"
+  disable: ""
+
+# filetype extensions for data/video files
+filetypes:
+  data: "npz"
+  video: "mp4"
+
+# pre-cmd-execution actions
+actions: 
+  - "bash set_device.sh"
+  - "cp /root/videos/ /root/GAST-Net-3DPoseEstimation/data/video"
+  

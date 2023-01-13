@@ -1,22 +1,7 @@
-import joblib as jb
 import json
-import cv2
-from cv2 import (
-    VideoCapture,
-    cvtColor,
-    COLOR_BGR2RGB,
-    imshow,
-    VideoWriter,
-    VideoWriter_fourcc,
-)
 import numpy as np
 import math
-import mediapipe as mp
-import os
 import pyquaternion as pq
-from shutil import copy
-import subprocess as sp
-from tqdm import tqdm
 
 poseModels = {"VIBE", "GAST", "BLAZEPOSE"}
 src_dir = "/root"

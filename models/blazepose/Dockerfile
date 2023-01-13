@@ -1,9 +1,19 @@
 FROM python:3.8-slim as base
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update
-RUN pip --no-cache-dir install -U pip && \
-    pip --no-cache-dir install mediapipe
-RUN mkdir /root/Blazepose /root/Blazepose/output 
-WORKDIR /root/Blazepose
-COPY exec_blazepose.py ./
-WORKDIR /home
+ENV DEBIAN_FRONTEND=noninteractive
+ENV MODEL=Blazepose
+ENV CMD="python3 main.py"
+ENV OUTPUT_DIR=/root/Blazepose/output
+ENV DATA_EXT=npz
+ENV VIDEO_EXT=mp4
+ENV TMP_DIR=/root/tmp
+ENV MODE=data
+
+COPY requirements.txt .
+
+COPY setup.sh .
+RUN setup.sh
+RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}
+WORKDIR /root/${MODEL}
+COPY *.py *.sh ./
+
+ENTRYPOINT [ "bash", "run.sh", "-v " ]

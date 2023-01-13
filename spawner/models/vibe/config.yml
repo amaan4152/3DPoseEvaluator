@@ -1,0 +1,27 @@
+dir: vibe
+name: VIBE
+output-dir: output
+python-version: 3.6.5
+cmd: python3 demo.py
+
+# model flags
+flags: 
+  - "--vid_file"
+  - "--output_folder": "output/"
+  - "--tracker_batch_size": 1
+  - "--vibe_batch_size": 64
+
+# video pose overlay flags
+animate-opt: 
+  enable: ""
+  disable: "--no_render"
+
+# filetype extensions for data/video files
+filetypes:
+  data: "pkl"
+  video: "mp4"
+
+# pre-cmd-execution actions
+actions:
+  - "bash set_device.sh"
+  

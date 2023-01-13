@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+  blazepose:
+    build:
+      context: ./models/blazepose
+      dockerfile: Dockerfile
+      shm_size: 2gb
+    volumes:
+    - data-vol:/root/tmp
+    deploy: &id001
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
+  gast-net:
+    build:
+      context: ./models/gast-net
+      dockerfile: Dockerfile
+      shm_size: 2gb
+    volumes:
+    - data-vol:/root/tmp
+    deploy: *id001
+  vibe:
+    build:
+      context: ./models/vibe
+      dockerfile: Dockerfile
+      shm_size: 2gb
+    volumes:
+    - data-vol:/root/tmp
+    deploy: *id001
+volumes:
+  data-vol: null
+  host-vol:
+    driver: local
+    driver_opts:
+      device: ~/Documents/NIST/3DPoseEvaluator
+      o: bind
+      type: none
+  input-vol:
+    driver: local
+    driver_opts:
+      device: ~/Documents/NIST/3DPoseEvaluator/output/
+      o: bind
+      type: none
+  models-vol:
+    driver: local
+    driver_opts:
+      device: ~/Documents/NIST/3DPoseEvaluator/models/
+      o: bind
+      type: none
+  output-vol:
+    driver: local
+    driver_opts:
+      device: ~/Documents/NIST/3DPoseEvaluator/output/
+      o: bind
+      type: none

@@ -1,13 +1,14 @@
-from numpy import load, array
+import sys
+from numpy import load, array, savez
 
 
-def parse_blazepose(npz_file):
+def parse_gast(npz_file):
     """
-    Parse Blazepose pose data
+    Parse GAST pose data
 
     Parameters
     ----------
-    npz_file: numpy zipped file of pose data in outputs folder after running Blazepose
+    npz_file: numpy zipped file of pose data in outputs folder after running GAST
 
     Return
     ------
@@ -16,5 +17,8 @@ def parse_blazepose(npz_file):
     """
     # WARNING: 3D coordinate system for GAST revolves around pelvis (keypoint #0) as origin
     # 3D array: dim_03->list of frame data of vid seq; dim_02 -> indexed by # of frames; dim_01 -> indexed by keypoint #
-    BP_data = load(npz_file)["pose_data"] * 1000
-    return BP_data
+    npz_file = sys.argv[1]
+    save_dir = sys.argv[2]
+    GAST_data = load(npz_file)["reconstruction"]
+    data = array(GAST_data[0]) * 1000  # convert data to millimeters
+    savez(f"{save_dir}/data.npz", data)

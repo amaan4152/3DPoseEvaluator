@@ -7,7 +7,7 @@ from utils.diagnostic_tools import timeit
 
 
 class ModelRegistry:
-    src = "./src/models"
+    src = "."
 
     # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
     OKCYAN = "\033[96m"
@@ -82,6 +82,8 @@ class ModelRegistry:
         `name`:  model name
         `video`: input video file
         """
+        model_dir = self.models[name]['dirname']
+
         print(f"\n\t\t\t\t  ===== {self.OKCYAN}{name.upper()}{self.ENDC} =====\n")
         path_type = self.models[name]["video_path_type"]
         vid_name = Path(video).name
@@ -89,7 +91,7 @@ class ModelRegistry:
             video = Path(video).absolute()
         elif path_type == "relative":
             video = Path(video).relative_to(
-                Path(f"/home/{self.models[name]['dirname']}")
+                Path(f"/home/{model_dir}")
             )
         elif path_type == "name":
             video = vid_name
@@ -105,6 +107,7 @@ class ModelRegistry:
             else:
                 if no_a_flag != "" and no_a_flag in self.models[name]["flags"].keys():
                     self.models[name]["flags"].pop(no_a_flag)
+                    
         cmd = self.__make_cmd(name, video)
         proc = sp.Popen(
             cmd,
@@ -167,7 +170,7 @@ class ModelRegistry:
                 )  # sort by most recent in modification time
                 if key == "video":
                     outputs[key] = [p.absolute() for p in out_files if p.is_file()]
-                else:
+                elif key == "data":
                     outputs[key] = [
                         str(p.absolute()) for p in out_files if p.is_file()
                     ][0]

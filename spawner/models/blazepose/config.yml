@@ -1,0 +1,23 @@
+dir: blazepose
+name: Blazepose
+output-dir: output
+python-version: 3.8
+cmd: python3 main.py
+
+# model flags
+flags:
+  - "-v"
+
+# video pose overlay flags
+animate-opt: 
+  enable: "--animate"
+  disable: ""
+
+# filetype extensions for data/video files
+filetypes:
+  data: "npz"
+  video: "mp4"
+
+# pre-cmd-execution actions
+actions: ~
+  
