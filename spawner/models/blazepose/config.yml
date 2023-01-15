@@ -4,9 +4,10 @@ output-dir: output
 python-version: 3.8
 cmd: python3 main.py
 
+
 # model flags
 flags:
-  - "-v"
+  - "-v": "/root/videos/sit_stand_x3-MATLAB_test.mp4"
 
 # video pose overlay flags
 animate-opt: 

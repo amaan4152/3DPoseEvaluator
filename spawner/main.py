@@ -70,11 +70,12 @@ def create_dockerfile(configs : dict) -> List[str]:
         actions = "; ".join(configs["actions"])
         dockerfile_contents.append(f"ENV ACTIONS=\"{actions}\"")
     if Path(f"models/{MODEL}/requirements.txt").exists():
-        dockerfile_contents.append("\nCOPY requirements.txt .")
+        dockerfile_contents.append("\nCOPY requirements.txt /")
     dockerfile_contents.extend(
         [
-            "\nCOPY setup.sh .",
-            "RUN setup.sh",
+            "SHELL [ \"/bin/bash\", \"-c\" ]",
+            "\nCOPY setup.sh /",
+            "RUN bash /setup.sh",
             "RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}",
             "WORKDIR /root/${MODEL}",
             "COPY *.py *.sh ./",                    # this does recopy setup.sh, but it will not be executed since it's for executing ACTION scripts

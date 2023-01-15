@@ -1,12 +1,12 @@
 dir: vibe
 name: VIBE
 output-dir: output
-python-version: 3.6.5
+python-version: 3.7.0
 cmd: python3 demo.py
 
 # model flags
 flags: 
-  - "--vid_file"
+  - "--vid_file" : "/root/video/sit_stand_x3-MATLAB_test.mp4"
   - "--output_folder": "output/"
   - "--tracker_batch_size": 1
   - "--vibe_batch_size": 64

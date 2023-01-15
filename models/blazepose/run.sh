@@ -3,7 +3,7 @@
 ${ACTIONS}      # execute action cmds if provided (empty str if not)
 ${CMD} ${@:1}   # argv[1] is the string of flags for the model command
 
-if [[ ${MODE} == "data"]]; then
+if [[ ${MODE} == "data" ]]; then
     EXT=${DATA_EXT}
     python3 reader.py ${OUTPUT_DIR}/*.${EXT} ${TMP_DIR}/${MODEL}
 elif [[ ${MODE} == "animate" ]]; then

@@ -2,12 +2,13 @@
 
 MODEL=GAST-Net-3DPoseEstimation
 apt-get update
-apt-get --no-install-recommends --no-install-suggests -yq install git wget
+apt-get --no-install-recommends --no-install-suggests -yq install git wget llvm
+apt-get install freeglut3 freeglut3-dev ffmpeg -y
 git clone https://github.com/fabro66/GAST-Net-3DPoseEstimation.git /root/${MODEL}
 
 cd /root/${MODEL}
 pip --no-cache-dir install -U pip
-pip --no-cache-dir install -r gast-requirements.txt
+pip --no-cache-dir install -r requirements.txt
 rm -f data/video/*  # clear existing videos
 rm -f output/*      # clear existing outputs
 mkdir checkpoint

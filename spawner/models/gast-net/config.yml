@@ -1,13 +1,12 @@
 dir: gast-net
 name: GAST-Net-3DPoseEstimation
 output-dir: output
-python-version: 3.8
+python-version: 3.6.5
 cmd: python3 gen_skes.py
-device: CPU
 
 # model flags
 flags: 
-  - "-v"
+  - "-v" : "/root/GAST-Net-3DPoseEstimation/data/video/sit_stand_x3-MATLAB_test.mp4"
   - "-np" : 1
 
 # video pose overlay flags

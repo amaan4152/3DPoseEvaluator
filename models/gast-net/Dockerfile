@@ -1,4 +1,4 @@
-FROM python:3.8-slim as base
+FROM python:3.6.5-slim as base
 ENV DEBIAN_FRONTEND=noninteractive
 ENV MODEL=GAST-Net-3DPoseEstimation
 ENV CMD="python3 gen_skes.py"
@@ -9,12 +9,13 @@ ENV TMP_DIR=/root/tmp
 ENV MODE=data
 ENV ACTIONS="bash set_device.sh; cp /root/videos/ /root/GAST-Net-3DPoseEstimation/data/video"
 
-COPY requirements.txt .
+COPY requirements.txt /
+SHELL [ "/bin/bash", "-c" ]
 
-COPY setup.sh .
-RUN setup.sh
+COPY setup.sh /
+RUN bash /setup.sh
 RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}
 WORKDIR /root/${MODEL}
 COPY *.py *.sh ./
 
-ENTRYPOINT [ "bash", "run.sh", "-v -np 1 " ]
+ENTRYPOINT [ "bash", "run.sh", "-v /root/GAST-Net-3DPoseEstimation/data/video/sit_stand_x3-MATLAB_test.mp4 -np 1 " ]

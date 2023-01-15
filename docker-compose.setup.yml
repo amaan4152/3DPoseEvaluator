@@ -2,22 +2,22 @@ version: "3.7"
 
 # adjust models memory as needed
 services:
-  device_configurator:
-    build:
-      dockerfile: Dockerfile
-      context: ./
-    command: docker-compose.pipeline.yml ${DEVICE}
-    volumes:
-      - ~/Documents/NIST/3DPoseEvaluator/:/root
-
   model-spawner:
     build:
       dockerfile: Dockerfile
       context: ./spawner
     command: ${MODE}
-    depends_on:
-      device_configurator:
-        condition: service_completed_successfully
     volumes:
       - ~/Documents/NIST/3DPoseEvaluator/spawner/:/root/spawner
       - ~/Documents/NIST/3DPoseEvaluator/models/:/root/models
+
+  device_configurator:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    command: docker-compose.pipeline.yml ${DEVICE}
+    depends_on:
+      model-spawner:
+        condition: service_completed_successfully
+    volumes:
+      - ~/Documents/NIST/3DPoseEvaluator/:/root
