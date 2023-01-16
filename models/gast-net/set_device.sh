@@ -1,7 +1,8 @@
 #!/bin/bash -i
 
 # check if container is deployed with GPU compute capabilitiess
-if [[ ! command -v nvidia-smi &> /dev/null ]]; then
+if ! command -v nvidia-smi &> /dev/null
+then
     echo "NOTICE: CUDA driver not detected assuming device is CPU..."
 
     # VIBE and GAST-NET uses torch.load to load in pretrained data. However, this causes problems

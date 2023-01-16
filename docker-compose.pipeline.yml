@@ -4,37 +4,50 @@ services:
     build:
       context: ./models/blazepose
       dockerfile: Dockerfile
-      shm_size: 2gb
+    shm_size: 1gb
     volumes:
-      - videos-vol:/root/videos
-      - data-vol:/root/tmp
+    - video-vol:/root/video
+    - data-vol:/root/tmp
     deploy:
-      &id001
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: 1
-              capabilities:
-                - gpu
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
   gast-net:
     build:
       context: ./models/gast-net
       dockerfile: Dockerfile
-      shm_size: 2gb
+    shm_size: 10gb
     volumes:
-      - videos-vol:/root/videos
-      - data-vol:/root/tmp
-    deploy: *id001
+    - video-vol:/root/video
+    - data-vol:/root/tmp
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
   vibe:
     build:
       context: ./models/vibe
       dockerfile: Dockerfile
-      shm_size: 2gb
+    shm_size: 10gb
     volumes:
-      - videos-vol:/root/videos
-      - data-vol:/root/tmp
-    deploy: *id001
+    - video-vol:/root/video
+    - data-vol:/root/tmp
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
 volumes:
   data-vol: null
   host-vol:
@@ -43,7 +56,7 @@ volumes:
       device: ~/Documents/NIST/3DPoseEvaluator
       o: bind
       type: none
-  videos-vol:
+  video-vol:
     driver: local
     driver_opts:
       device: ~/Documents/NIST/3DPoseEvaluator/videos/

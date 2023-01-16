@@ -7,7 +7,7 @@ cmd: python3 main.py
 
 # model flags
 flags:
-  - "-v": "/root/videos/sit_stand_x3-MATLAB_test.mp4"
+  - "-v": "/root/video/sit_stand_x3-MATLAB_test.mp4"
 
 # video pose overlay flags
 animate-opt: 

@@ -17,4 +17,4 @@ RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}
 WORKDIR /root/${MODEL}
 COPY *.py *.sh ./
 
-ENTRYPOINT [ "bash", "run.sh", "-v /root/videos/sit_stand_x3-MATLAB_test.mp4 " ]
+ENTRYPOINT [ "bash", "run.sh", "-v /root/video/sit_stand_x3-MATLAB_test.mp4 " ]

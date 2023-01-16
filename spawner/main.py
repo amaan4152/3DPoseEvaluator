@@ -67,7 +67,7 @@ def create_dockerfile(configs : dict) -> List[str]:
         f"ENV MODE={MODE}"
     ]
     if configs["actions"] is not None:
-        actions = "; ".join(configs["actions"])
+        actions = " && ".join(configs["actions"])
         dockerfile_contents.append(f"ENV ACTIONS=\"{actions}\"")
     if Path(f"models/{MODEL}/requirements.txt").exists():
         dockerfile_contents.append("\nCOPY requirements.txt /")

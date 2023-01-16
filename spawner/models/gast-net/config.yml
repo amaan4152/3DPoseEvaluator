@@ -6,7 +6,7 @@ cmd: python3 gen_skes.py
 
 # model flags
 flags: 
-  - "-v" : "/root/GAST-Net-3DPoseEstimation/data/video/sit_stand_x3-MATLAB_test.mp4"
+  - "-v" : "sit_stand_x3-MATLAB_test.mp4"
   - "-np" : 1
 
 # video pose overlay flags
@@ -22,5 +22,5 @@ filetypes:
 # pre-cmd-execution actions
 actions: 
   - "bash set_device.sh"
-  - "cp /root/videos/ /root/GAST-Net-3DPoseEstimation/data/video"
-  
+  - "cp /root/video/sit_stand_x3-MATLAB_test.mp4 /root/GAST-Net-3DPoseEstimation/data/video"
+    

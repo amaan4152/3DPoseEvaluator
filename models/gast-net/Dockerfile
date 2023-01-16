@@ -7,7 +7,7 @@ ENV DATA_EXT=npz
 ENV VIDEO_EXT=mp4
 ENV TMP_DIR=/root/tmp
 ENV MODE=data
-ENV ACTIONS="bash set_device.sh; cp /root/videos/ /root/GAST-Net-3DPoseEstimation/data/video"
+ENV ACTIONS="bash set_device.sh && cp /root/video/sit_stand_x3-MATLAB_test.mp4 /root/GAST-Net-3DPoseEstimation/data/video"
 
 COPY requirements.txt /
 SHELL [ "/bin/bash", "-c" ]
@@ -18,4 +18,4 @@ RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}
 WORKDIR /root/${MODEL}
 COPY *.py *.sh ./
 
-ENTRYPOINT [ "bash", "run.sh", "-v /root/GAST-Net-3DPoseEstimation/data/video/sit_stand_x3-MATLAB_test.mp4 -np 1 " ]
+ENTRYPOINT [ "bash", "run.sh", "-v sit_stand_x3-MATLAB_test.mp4 -np 1 " ]

@@ -36,6 +36,8 @@ def main(compose_path : str, device_mode : str):
     else:
         ValueError("Incorrect device mode specified. Supported device modes: CPU or GPU")
 
+    # disable YAML anchors: https://github.com/yaml/pyyaml/issues/535
+    yaml.SafeDumper.ignore_aliases = lambda self, data: True
     with open(compose_path, "w+") as s:
         yaml.dump(configs, stream=s, Dumper=yaml.SafeDumper, sort_keys=False)
     stream.close()
