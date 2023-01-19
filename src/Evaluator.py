@@ -1,8 +1,9 @@
-from typing import Tuple
 import numpy as np
 import pandas as pd
-import scipy
 
+from typing import Tuple
+
+OUTPUT_DIR = "/root/output"
 
 class Evaluator:
     MOD_FPS = 60
@@ -10,17 +11,25 @@ class Evaluator:
     FAIL = "\033[91m"
     ENDC = "\033[0m"
 
-    def __init__(self, model: str, video: str):
-        self.model_name = model
-        df_model = pd.read_csv(
-            f"output/{model}-{video}-raw_data.csv", header=[0, 1, 2, 3]
-        )
-        self.df_theta_model = df_model.iloc[:, 1]
-        self.df_pos_model = df_model.iloc[:, 2:]
-        self.df_gnd = pd.read_csv(
-            f"output/gnd-{video}-raw_data.csv", header=[0, 1, 2, 3]
-        ).iloc[:, 1:]
-        self.__gnd_align()
+    def __init__(
+        self, 
+        model : str = "",
+        vid_name : str = "",
+        df_gnd : pd.DataFrame = None, 
+        df_model_ref : pd.DataFrame = None
+    ):
+        if df_gnd is None and df_model_ref is None:
+            df_model_ref = pd.read_csv(
+                f"{OUTPUT_DIR}/{model}/{vid_name}/raw_data.csv", header=[0, 1, 2, 3]
+            ).iloc[:, 1:]
+            df_gnd = pd.read_csv(
+                f"{OUTPUT_DIR}/gnd_truth/{vid_name}/raw_data.csv", header=[0, 1, 2, 3]
+            ).iloc[:, 1:]
+        self.df_theta_model = df_model_ref.iloc[:, 0]
+        self.df_pos_model = df_model_ref.iloc[:, 1:]
+
+        self.df_gnd = df_gnd
+        self.__gnd_align()                  # perform frame ID alignment
         self.df_theta_gnd = self.df_gnd.iloc[:, 0].to_frame()
         self.df_pos_gnd = self.df_gnd.iloc[:, 1:]
 

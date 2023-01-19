@@ -12,6 +12,8 @@ import numpy as np
 import mediapipe as mp
 import os
 import shutil
+
+from pathlib import Path
 from tqdm import tqdm
 
 # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
@@ -57,14 +59,14 @@ def cli_parse():
 
 
 def init_dir(path, model_name):
-    if os.path.exists(path):
-        return
-    else:
-        os.makedirs(path)
-        shutil.copy(__file__, path)
-        os.makedirs(f"{path}/output")
+    if not Path(path).exists():
         logging("WARNING", f"Initialized directory of {model_name}")
-
+        shutil.copy(__file__, path)
+        os.makedirs(path)
+    if not Path(f"{path}/output").exists():
+        logging("WARNING", f"Initialized output directory of {model_name}")
+        os.makedirs(f"{path}/output")
+    return
 
 def exec_blazepose(vid_path, save_out=False):
     # init mediapipe

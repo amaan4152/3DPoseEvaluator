@@ -3,6 +3,7 @@ import pandas as pd
 from numba import jit
 import numpy as np
 import pyquaternion as pq
+import yaml
 
 WARNING = "\033[93m"
 FAIL = "\033[91m"
@@ -24,15 +25,14 @@ class GroundTruth(object):
         header_row_list: list,
         start_frame: int,
         end_frame: int,
+        joints: dict,
     ):
-        print(
-            f"[{WARNING}WARNING{ENDC}]: Extracting and compiling ground truth data..."
-        )
         # configure frame ID range for ground truth
         self.sframe = start_frame
         self.fframe = end_frame
         self.sframe *= int(self.OTS_FPS / self.VID_FPS)
         self.fframe *= int(self.OTS_FPS / self.VID_FPS)
+        self.joints = joints
 
         # get ground truth and joints config
         self.gnd_df = (
@@ -42,32 +42,23 @@ class GroundTruth(object):
             .astype(float)
             .iloc[self.sframe : self.fframe, :]
         )
-        with open(f"{self.src}/cfg_joints.json", "r") as cfg_model_file:
-            self.joints_dict = json.load(cfg_model_file)
         self.cols = np.array(list(map(list, self.gnd_df.columns)))
 
         # get root origin joint
         self.__get_origin()
 
-    def get_joints(self, adj_joints_vec: dict):
-        vertex = list(adj_joints_vec.keys())[0]  # size 1
-        joint_list = list(*adj_joints_vec.values())
-        assert (
-            len(joint_list) == 3
-        ), f"{FAIL}ERROR{ENDC}: Joint adjacency list must be of size 3"
-        assert (
-            joint_list[1] == vertex
-        ), f"{FAIL}ERROR{ENDC}: Joint adjacency list not in proper order"
+    def get_joints(self):
+        joint_labels = list(self.joints.keys())
 
         # get xyz positional data of each joint
-        num_joints = len(joint_list)
+        num_joints = len(joint_labels)
         gnd_pos = [None] * num_joints
         bone_rots = [None] * 2
-        for i, joint in enumerate(joint_list):
+        for i, j in enumerate(joint_labels):
             """
             Each joint has 1 bone, and could have `n` > 0 number of markers
             """
-            gnd_truth_joint = self.joints_dict[joint]["GND_TRUTH"]
+            gnd_truth_joint = self.joints[j]["truth"]
             bones = gnd_truth_joint["bones"]
             markers = gnd_truth_joint["markers"]
 
@@ -93,8 +84,10 @@ class GroundTruth(object):
         return (np.array(gnd_pos), gnd_quat, gnd_theta)
 
     def __get_origin(self) -> None:
-        left_hip = self.joints_dict["LEFT_HIP"]["GND_TRUTH"]
-        right_hip = self.joints_dict["RIGHT_HIP"]["GND_TRUTH"]
+        with open("joints_kinematic_table.yml", "r") as stream:
+            joints_cfg = yaml.load(stream=stream, Loader=yaml.SafeLoader)
+        left_hip = joints_cfg["left-leg"]["left-hip"]["truth"]
+        right_hip = joints_cfg["right-leg"]["right-hip"]["truth"]
 
         left_hip = (
             left_hip["bones"] if left_hip["markers"] == [] else left_hip["markers"]

@@ -82,7 +82,7 @@ class ModelRegistry:
         `name`:  model name
         `video`: input video file
         """
-        model_dir = self.models[name]['dirname']
+        model_dir = self.models[name]["dirname"]
 
         print(f"\n\t\t\t\t  ===== {self.OKCYAN}{name.upper()}{self.ENDC} =====\n")
         path_type = self.models[name]["video_path_type"]
@@ -90,9 +90,7 @@ class ModelRegistry:
         if path_type == "absolute":
             video = Path(video).absolute()
         elif path_type == "relative":
-            video = Path(video).relative_to(
-                Path(f"/home/{model_dir}")
-            )
+            video = Path(video).relative_to(Path(f"/home/{model_dir}"))
         elif path_type == "name":
             video = vid_name
 
@@ -107,7 +105,7 @@ class ModelRegistry:
             else:
                 if no_a_flag != "" and no_a_flag in self.models[name]["flags"].keys():
                     self.models[name]["flags"].pop(no_a_flag)
-                    
+
         cmd = self.__make_cmd(name, video)
         proc = sp.Popen(
             cmd,

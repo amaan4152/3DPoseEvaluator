@@ -15,3 +15,5 @@ Makefile
 poetry.lock
 pyproject.toml
 README.md
+test.sh
+sample_test.sh

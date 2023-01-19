@@ -4,4 +4,4 @@ RUN pip --no-cache-dir install -U pip
 RUN pip --no-cache-dir install PyYAML
 
 WORKDIR /root/spawner
-ENTRYPOINT [ "source", "run.sh" ]
+ENTRYPOINT [ "bash", "run.sh" ]

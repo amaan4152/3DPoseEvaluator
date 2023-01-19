@@ -1,14 +1,11 @@
 import joblib
 import sys
-from numpy import savez
+from numpy import save
 
-def parse_vibe(pkl_file):
+
+def main():
     """
     Parse VIBE pose data
-
-    Parameters
-    ----------
-    pkl_file: pickle file of pose data in outputs folder after running VIBE
 
     Return
     ------
@@ -19,4 +16,7 @@ def parse_vibe(pkl_file):
     save_dir = sys.argv[2]
     pkl_data = joblib.load(pkl_file)
     data = pkl_data[1]["joints3d"] * 1000
-    savez(f"{save_dir}/data.npz", data)
+    save(f"{save_dir}/data.npy", data)
+
+if __name__ == "__main__":
+    main()

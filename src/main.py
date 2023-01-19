@@ -4,6 +4,9 @@ import pandas as pd
 import subprocess
 from GroundTruth import GroundTruth
 
+DATA_DIR = "/root/tmp"
+OUTPUT_DIR = "/root/output"
+
 # https://stackoverflow.com/questions/287871/how-do-i-print-colored-text-to-the-terminal
 HEADER = "\033[95m"
 OKBLUE = "\033[94m"
@@ -50,14 +53,6 @@ def cli_parse():
         description="Evaluate GAST-NET, VIBE, and Blazepose 3D pose estimation algorithms on NIST video files to determine error metrics, \
                                           such as PDJ and MPJPE, against ground truth data (OTS and IMU data)."
     )
-
-    pcli.add_argument(
-        "-m",
-        "--model",
-        action="store",
-        type=str,
-        help="specific 3D pose estimation model to be used; if not specified, then all models will be executed",
-    )
     pcli.add_argument(
         "-v",
         "--video",
@@ -66,14 +61,14 @@ def cli_parse():
         help="input video path to be processed",
     )
     pcli.add_argument(
-        "-t",
-        "--test",
-        action="store",
-        type=str,
-        help='specify GAIT for "--test" to accomodate for GAIT OTS data',
+        "-d", "--data", action="store", type=str, help="ground truth data"
     )
     pcli.add_argument(
-        "-d", "--data", action="store", type=str, help="ground truth data"
+        "-k",
+        "--kinm_chain",
+        action="store",
+        type=str,
+        help="kinematic chain of interest; consult 'joints_kinematic.yml' to select valid chains",
     )
     pcli.add_argument(
         "--eval",
@@ -102,128 +97,209 @@ def cli_parse():
 
     return pcli, pcli.parse_args()
 
-
 import os
 import seaborn as sns
 
 sns.set()
 
-def generate_plots(df_gnd_re: pd.DataFrame, vid_name: str, joints: dict):
-    df_list = {"THETA": []}
-    data_files = [f for f in os.listdir("output/") if "raw_data" in f and vid_name in f]
-    for file in data_files:
-        df_raw = pd.read_csv(f"output/{file}", header=[0, 1, 2, 3])
-        mod_name = df_raw.columns[1][0]
-        if mod_name == "GND_TRUTH":
-            continue
 
-        df_theta = [df_raw[mod_name][j]["Joint Angle"] for j in joints.keys()]
-        for df in df_theta:
-            df.columns = [mod_name]
-        df_list["THETA"].extend(df_theta)
-
-    for j in joints.keys():
-        df_models = pd.concat(df_list["THETA"], axis=1)
-        if df_gnd_re is not None:
-            df_gnd = df_gnd_re["GND_TRUTH"][j]["Joint Angle"]
-            df_gnd.columns = ["ground-truth"]
-            df_models = pd.concat([df_gnd, df_models], axis=1)
-
-        joint_name = " ".join([s.capitalize() for s in j.split("_")])
-        plt.figure(figsize=(15, 5))
-        ax = sns.lineplot(data=df_models)
-        plt.title(f"{joint_name} Joint Angle Plot")
-        plt.xlabel("Frame ID")
-        plt.ylabel(r"$\theta(^{\circ})$")
-        plt.xlim(left=-10)
-        plt.tight_layout()
-        plt.savefig(f"output/{j.upper()}_JOINTANGLE_PLOT.png")
-        plt.close()
+def generate_joint_angles_plot(df_joint_angles : pd.DataFrame, vid_name: str, kinematic_chain: str):
+    joint_name = " ".join([s.upper() for s in kinematic_chain.split("-")])
+    fname_joint_substr = "_".join(joint_name.split(" "))
+    plt.figure(figsize=(15, 5))
+    sns.lineplot(data=df_joint_angles)
+    plt.title(f"{joint_name} Joint Angle Plot")
+    plt.xlabel("Frame ID")
+    plt.ylabel(r"$\theta(^{\circ})$")
+    plt.xlim(left=-10)
+    plt.tight_layout()
+    plt.savefig(f"{OUTPUT_DIR}/plots/{vid_name}/PLOT-{fname_joint_substr}-joint_angle.png")
+    plt.close()
 
 
+def generate_gnd_truth(
+    file: str, 
+    vid_name : str,
+    start_frame: int,
+    end_frame: int,
+    joints: dict,
+    kinematic_chain: str 
+):
+    GT = GroundTruth(
+        file=file,
+        skp_rows=3,
+        header_row_list=[0, 2, 3],
+        start_frame=start_frame,
+        end_frame=end_frame,
+        joints=joints,
+    )
+    GT_pos, GT_quat, GT_theta = GT.get_joints()
+
+    gt_data = {"theta": GT_theta, "pos": GT_pos, "quat": GT_quat}
+    df_gt_raw = data_parse(
+        model_name="GND_TRUTH", 
+        model_data=gt_data, 
+        kinematic_chain=kinematic_chain, 
+        joints=joints
+    )
+
+    df_gt_raw.to_csv(f"{OUTPUT_DIR}/gnd_truth/{vid_name}/raw_data.csv")
+    logging("GOOD", "Successfully extracted and compiled ground truth data")
+    return df_gt_raw
+
+
+import os
+import yaml
+
+from glob import glob
 from pose_gen import data_parse, pose_gen
 from Evaluator import Evaluator
 from pathlib import Path
 
 
-def main():
-    # parse CLI arguments
-    pcli, args = cli_parse()
-    if None in (args.model, args.video):
-        print("ERROR: must provide arguments for '-m' and '-v'\n")
-        pcli.print_help()
-        exit(1)
+def main(
+    video: str,
+    truth_file: str,
+    kinematic_chain: str,
+    start_frame: int,
+    end_frame: int,
+    evaluate: bool = False,
+    animate: bool = False,
+):
+    df_joint_angles_list = []
+    vid_name = Path(video).name.lower().split(".")[0]
 
-    joints = {"RIGHT_KNEE": ["RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"]}
-    joint_list = list(*joints.values())
-    # duration = get_duration(args.video)
-    # print(f"Duration: {duration}")
-
-    # pose raw data generation
-    mod_name = args.model.lower()
-    vid_name = Path(args.video).name.lower().split(".")[0]
-    if not args.eval:
-        df_m_raw = pose_gen(
-            args.video, args.data, mod_name, args.animate, args.start, args.end, joints
+    # extract selected kinematic chain froom joints table
+    with open("joints_kinematic_table.yml", "r") as stream:
+        joints_cfg = yaml.load(stream=stream, Loader=yaml.SafeLoader)
+    valid_chains = list(joints_cfg.keys())
+    if kinematic_chain not in valid_chains:
+        ValueError(
+            f"Invalid kinematic chain selected. Current supported chains include: {valid_chains}"
         )
-        if not args.animate:
-            df_m_raw.to_csv(f"output/{mod_name}-{vid_name}-raw_data.csv")
-            ETool = Evaluator(mod_name, vid_name)
-            generate_plots(ETool.df_theta_gnd, vid_name, joints)
-        else:
+    joints = joints_cfg[kinematic_chain]
+    joint_labels = list(joints.keys())
+
+    # get model names from model directories in data-vol
+    model_dirs = glob(pathname=f"{DATA_DIR}/*/", recursive=True)
+    model_dirs = [m.split('/')[3] for m in model_dirs]
+
+    # compile ground-truth data
+    os.makedirs(f"{OUTPUT_DIR}/gnd_truth/{vid_name}", exist_ok=True)
+    df_truth = generate_gnd_truth(
+        file=truth_file,
+        vid_name=vid_name,
+        start_frame=start_frame,
+        end_frame=end_frame,
+        joints=joints,
+        kinematic_chain=kinematic_chain
+    )
+
+    # iterate through each model data dir that has been executed
+    for model in model_dirs:
+        os.makedirs(f"{OUTPUT_DIR}/{model}/{vid_name}", exist_ok=True)
+        if not evaluate:    # pose raw data generation
+            raw_fname = f"{OUTPUT_DIR}/{model}/{vid_name}/raw_data.csv"
+            df_model = pose_gen(
+                model_type=model,
+                joints=joints,
+                kinematic_chain=kinematic_chain
+            )
+            logging("GOOD", f"Successfully extracted and compiled {model} data")
+            df_model.to_csv(raw_fname)
+            df_model_theta = df_model.iloc[:, 0].to_frame()
+            df_model_theta.columns = [model]
+            df_joint_angles_list.append(df_model_theta)
+        elif animate:   # pose animation
             logging(
                 "WARNING",
                 "No pose data and plot have been generated due to animation flag...",
             )
+        else: # pose evaluation
+            logging("GOOD", f"{model.capitalize()} Evaluation")
+            GT = GroundTruth(
+                file=truth_file,
+                skp_rows=3,
+                header_row_list=[0, 2, 3],
+                start_frame=start_frame,
+                end_frame=end_frame,
+                joints=joints,
+            )
 
-    # pose evaluation
-    else:
-        GT = GroundTruth(
-            args.data,
-            skp_rows=3,
-            header_row_list=[0, 2, 3],
-            start_frame=args.start,
-            end_frame=args.end,
+            # calibrate
+            ETool = Evaluator(model=model, vid_name=vid_name)
+            [MCAL_pos, mod_theta] = ETool.calibrate(N=1)
+
+            # save calibration data
+            cal_fname = f"{OUTPUT_DIR}/{model}/{vid_name}/cal_data.csv"
+            CAL_data = {"theta": mod_theta, "pos": MCAL_pos, "quat": []}
+            df_cal = data_parse(
+                model_name=f"{model}:<CAL>",
+                model_data=CAL_data,
+                kinematic_chain=kinematic_chain,
+                joints=joints
+            )
+            df_cal.to_csv(cal_fname)
+
+            # MPJPE
+            mean_dists = ETool.MPJPE(df_cal.iloc[:, 1:])
+            df_dists = pd.DataFrame({"MPJPE": mean_dists}, index=joint_labels)
+
+            # display MPJPE
+            metrics_fname = f"{OUTPUT_DIR}/{model}/{vid_name}/eval_metrics.csv"
+            mpjpe_stats = df_dists.describe()
+            mpjpe_stats.columns = ["Statistics"]
+            print(df_dists)
+            print(mpjpe_stats)
+
+            # PDJ
+            pdj = ETool.PDJ(df_pos_cal=df_cal.iloc[:, 1:], torso_diam=GT.torso_diam)
+            df_pdj = pd.DataFrame({"PDJ": pdj}, index=joint_labels)
+
+            # display MPJPE
+            pdj_stats = df_pdj.describe()
+            pdj_stats.columns = ["Statistics"]
+            print(df_pdj)
+            print(pdj_stats)
+
+            # save metrics
+            df_metrics = pd.concat([df_dists, df_pdj], axis=1)
+            df_stats = pd.concat([mpjpe_stats, pdj_stats], axis=1)
+            df_metrics.to_csv(metrics_fname)
+            df_stats.to_csv(metrics_fname, mode="a")
+
+    if not (evaluate or animate):
+        # Any model can be used as reference for alignment based on the assumption that all models have the same # of frames
+        df_truth_theta = Evaluator(
+            df_gnd=df_truth, 
+            df_model_ref=df_model
+        ).df_theta_gnd  # performs ground-truth alignment assuming model FPS is 60 FPS
+        df_truth_theta.columns = ["ground-truth"]   # label for plotting
+        df_joint_angles_list.insert(0, df_truth_theta)
+
+        os.makedirs(f"{OUTPUT_DIR}/plots/{vid_name}", exist_ok=True)
+        df_joint_angles = pd.concat(df_joint_angles_list, axis=1)
+        generate_joint_angles_plot(
+            df_joint_angles=df_joint_angles,
+            vid_name=vid_name,
+            kinematic_chain=kinematic_chain
         )
-
-        # calibrate
-        ETool = Evaluator(mod_name, vid_name)
-        [MCAL_pos, mod_theta] = ETool.calibrate(N=1)
-
-        # save calibration data
-        CAL_data = {"theta": mod_theta, "pos": MCAL_pos, "quat": []}
-        df_cal = data_parse(f"{mod_name}:<CAL>", CAL_data, joints)
-        df_cal.to_csv(f"output/{mod_name}-{vid_name}-cal_data.csv")
-
-        # MPJPE
-        mean_dists = ETool.MPJPE(df_cal.iloc[:, 1:])
-        df_dists = pd.DataFrame({"MPJPE": mean_dists}, index=joint_list)
-
-        # display MPJPE
-        metrics_fname = f"output/{mod_name}-{vid_name}-eval_metrics.csv"
-        mpjpe_stats = df_dists.describe()
-        mpjpe_stats.columns = ["Statistics"]
-        print(df_dists)
-        print(mpjpe_stats)
-
-        # PDJ
-        pdj = ETool.PDJ(df_cal.iloc[:, 1:], GT.torso_diam)
-        df_pdj = pd.DataFrame({"PDJ": pdj}, index=joint_list)
-
-        # display MPJPE
-        pdj_stats = df_pdj.describe()
-        pdj_stats.columns = ["Statistics"]
-        print(df_pdj)
-        print(pdj_stats)
-
-        # save metrics
-        df_metrics = pd.concat([df_dists, df_pdj], axis=1)
-        df_stats = pd.concat([mpjpe_stats, pdj_stats], axis=1)
-        df_metrics.to_csv(metrics_fname)
-        df_stats.to_csv(metrics_fname, mode="a")
-
     logging("GOOD", "successful termination without error")
 
 
 if __name__ == "__main__":
-    main()
+    # parse CLI arguments
+    _, args = cli_parse()
+    if None in (args.video, args.data, args.kinm_chain, args.start, args.end):
+        ValueError(
+            "Must provide arguments for '--video', '--data', '--kinm_chain', '--start', and '--end'\n"
+        )
+    main(
+        video=args.video,
+        truth_file=args.data,
+        kinematic_chain=args.kinm_chain,
+        start_frame=args.start,
+        end_frame=args.end,
+        evaluate=args.eval,
+        animate=args.animate,
+    )

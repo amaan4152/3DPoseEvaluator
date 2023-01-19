@@ -1,14 +1,10 @@
 import sys
-from numpy import load, array, savez
+from numpy import load, array, save
 
 
-def parse_gast(npz_file):
+def main():
     """
     Parse GAST pose data
-
-    Parameters
-    ----------
-    npz_file: numpy zipped file of pose data in outputs folder after running GAST
 
     Return
     ------
@@ -21,4 +17,7 @@ def parse_gast(npz_file):
     save_dir = sys.argv[2]
     GAST_data = load(npz_file)["reconstruction"]
     data = array(GAST_data[0]) * 1000  # convert data to millimeters
-    savez(f"{save_dir}/data.npz", data)
+    save(f"{save_dir}/data.npy", data)
+
+if __name__ == "__main__":
+    main()

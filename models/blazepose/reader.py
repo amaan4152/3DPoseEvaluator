@@ -1,8 +1,8 @@
 import sys
-from numpy import load, savez
+from numpy import load, save
 
 
-def parse_gast(npz_file):
+def main():
     """
     Parse Blazepose pose data
 
@@ -15,4 +15,7 @@ def parse_gast(npz_file):
     npz_file = sys.argv[1]
     save_dir = sys.argv[2]
     data = load(npz_file)["pose_data"] * 1000
-    savez(f"{save_dir}/data.npz", data)
+    save(f"{save_dir}/data.npy", data)
+
+if __name__ == "__main__":
+    main()

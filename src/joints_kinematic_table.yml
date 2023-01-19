@@ -1,0 +1,92 @@
+left-leg: 
+  left-hip:
+    truth: 
+      bones: ["Hip"]
+      markers: ["WaistLFront"]
+    blazepose: 23
+    gast-net: 4
+    vibe: 12
+  left-knee:
+    truth: 
+      bones: ["LThigh"]
+      markers: ["LKneeOut", "LKneeIn"]
+    blazepose: 25
+    gast-net: 5
+    vibe: 13
+  left-ankle:
+    truth: 
+      bones: ["LShin"]
+      markers: ["LAnkleOut", "LAnkleIn"]
+    blazepose: 27
+    gast-net: 6
+    vibe: 14
+
+left-arm:
+  left-shoulder:
+    truth:
+      bones: ["LShoulder"]
+      markers: ["LShoulder"]
+    blazepose: 11
+    gast-net: 11
+    vibe: 5
+  left-elbow:
+    truth:
+      bones: ["LFArm"]
+      markers: ["LFArm"]
+    blazepose: 13
+    gast-net: 12
+    vibe: 6
+  left-wrist:
+    truth:
+      bones: ["LHand"]
+      markers: ["LHand"]
+    blazepose: 15
+    gast-net: 13
+    vibe: 7
+
+
+right-leg:
+  right-hip:
+    truth: 
+      bones: ["Hip"]
+      markers: ["WaistRFront"]
+    blazepose: 24
+    gast-net: 1
+    vibe: 9
+  right-knee:
+    truth: 
+      bones: ["RThigh"]
+      markers: ["RKneeOut", "RKneeIn"]
+    blazepose: 26
+    gast-net: 2
+    vibe: 10
+  right-ankle:
+    truth: 
+      bones: ["RShin"]
+      markers: ["RAnkleOut", "RAnkleIn"]
+    blazepose: 28
+    gast-net: 3
+    vibe: 11
+    
+right-arm:
+  right-shoulder:
+    truth:
+      bones: ["RShoulder"]
+      markers: ["RShoulder"]
+    blazepose: 12
+    gast-net: 14
+    vibe: 2
+  right-elbow:
+    truth:
+      bones: ["RFArm"]
+      markers: ["RFArm"]
+    blazepose: 14
+    gast-net: 15
+    vibe: 3
+  right-wrist:
+    truth:
+      bones: ["RHand"]
+      markers: ["RHand"]
+    blazepose: 16
+    gast-net: 16
+    vibe: 4

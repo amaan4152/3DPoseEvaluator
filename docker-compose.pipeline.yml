@@ -1,59 +1,83 @@
 version: '3.7'
 services:
+  evaluator:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    command: ${VIDEO} ${GND} ${CHAIN} ${START} ${END}
+    shm_size: 1gb
+    volumes:
+      - ~/Documents/NIST/3DPoseEvaluator/data/:/root/data/
+      - output-vol:/root/output
+      - blazepose-vol:/root/tmp/blazepose
+      - gast-net-vol:/root/tmp/gast-net
+      - vibe-vol:/root/tmp/vibe
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
   blazepose:
     build:
       context: ./models/blazepose
       dockerfile: Dockerfile
     shm_size: 1gb
     volumes:
-    - video-vol:/root/video
-    - data-vol:/root/tmp
+      - video-vol:/root/video
+      - blazepose-vol:/root/tmp/
     deploy:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            count: 1
-            capabilities:
-            - gpu
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
   gast-net:
     build:
       context: ./models/gast-net
       dockerfile: Dockerfile
     shm_size: 10gb
+    stdin_open: true
+    tty: true
     volumes:
-    - video-vol:/root/video
-    - data-vol:/root/tmp
+      - video-vol:/root/video
+      - gast-net-vol:/root/tmp/
     deploy:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            count: 1
-            capabilities:
-            - gpu
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
   vibe:
     build:
       context: ./models/vibe
       dockerfile: Dockerfile
     shm_size: 10gb
     volumes:
-    - video-vol:/root/video
-    - data-vol:/root/tmp
+      - video-vol:/root/video
+      - vibe-vol:/root/tmp
     deploy:
       resources:
         reservations:
           devices:
-          - driver: nvidia
-            count: 1
-            capabilities:
-            - gpu
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
 volumes:
-  data-vol: null
-  host-vol:
+  blazepose-vol: null
+  gast-net-vol: null
+  vibe-vol: null
+  output-vol:
     driver: local
     driver_opts:
-      device: ~/Documents/NIST/3DPoseEvaluator
+      device: ~/Documents/NIST/3DPoseEvaluator/output/
       o: bind
       type: none
   video-vol:

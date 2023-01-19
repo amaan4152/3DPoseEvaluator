@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "nist-3dpose_evaluator"
-version = "0.1.0"
+name = "3DPoseEvaluator"
+version = "2.0.0"
 description = "Program to evaluate NIST-provided human locomotion video sequences with 3D pose estimation algorithms: GAST-NET, VIBE, and Blazepose"
 authors = ["Amaan Rahman <amaan.rahman.usa@gmail.com>"]
 
@@ -16,12 +16,12 @@ resampy = "^0.2.2"
 pyquaternion = "^0.9.9"
 opencv-python = "^4.5.5"
 joblib = "^1.1.0"
-mediapipe = "^0.8.9"
 argparse = "^1.4.0"
 Cython = "^0.29.26"
 setuptools = "^60.5.0"
 ffmpeg = "^1.4"
 numba = "^0.55.2"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"

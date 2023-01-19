@@ -14,7 +14,6 @@ SHELL [ "/bin/bash", "-c" ]
 
 COPY setup.sh /
 RUN bash /setup.sh
-RUN mkdir -p /root/${MODEL} ${TMP_DIR}/${MODEL} ${OUTPUT_DIR}
 WORKDIR /root/${MODEL}
 COPY *.py *.sh ./
 
